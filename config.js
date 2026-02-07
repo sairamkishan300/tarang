@@ -8,12 +8,12 @@ const CONFIG = {
 
     // Payment Details
     ticketPrice: 85,
-    upiId: "saimusick204@oksbi",
+    upiId: "saimusick204@okhdfcbank",
     upiName: "Sai Ram Kishan",
 
     // Contact & Support
     supportEmail: "saimusick204@gmail.com",
-    supportPhone: "+91 98765 43210",
+    supportPhone: "+91 86819 74507",
 
     // Google OAuth
     googleClientId: "1011495957114-jftfnap62g44g6a6l50psgc615tatckr.apps.googleusercontent.com",
