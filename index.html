@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="images/logo.png">
+    <title>Tarang#1 - Musical Evening 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #000;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .bg-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .bg-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.3;
+            filter: blur(0.5px);
+        }
+
+        .bg-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(0, 242, 254, 0.3) 0%, rgba(255, 0, 102, 0.3) 100%);
+            mix-blend-mode: multiply;
+        }
+
+        /* Neon Glow Effects */
+        @keyframes neonPulse {
+
+            0%,
+            100% {
+                text-shadow: 0 0 10px #00f2fe, 0 0 20px #00f2fe, 0 0 30px #00f2fe, 0 0 40px #ff0066;
+            }
+
+            50% {
+                text-shadow: 0 0 20px #00f2fe, 0 0 30px #00f2fe, 0 0 40px #00f2fe, 0 0 60px #ff0066;
+            }
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        /* Container */
+        .container {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        /* Logo */
+        .logo-container {
+            margin-bottom: 30px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .logo {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid #00f2fe;
+            box-shadow: 0 0 30px #00f2fe, 0 0 60px #ff0066;
+            animation: neonPulse 2s ease-in-out infinite;
+        }
+
+        /* Title */
+        .title {
+            font-size: 5em;
+            font-weight: 900;
+            text-align: center;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, #00f2fe, #ff0066, #00f2fe);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradient 3s ease infinite, titleGlow 2s ease-in-out infinite;
+            filter: drop-shadow(0 0 15px rgba(0, 242, 254, 0.8)) drop-shadow(0 0 25px rgba(255, 0, 102, 0.6)) drop-shadow(0 0 35px rgba(0, 242, 254, 0.4));
+        }
+
+        @keyframes titleGlow {
+
+            0%,
+            100% {
+                filter: drop-shadow(0 0 15px rgba(0, 242, 254, 0.8)) drop-shadow(0 0 25px rgba(255, 0, 102, 0.6)) drop-shadow(0 0 35px rgba(0, 242, 254, 0.4));
+            }
+
+            50% {
+                filter: drop-shadow(0 0 20px rgba(0, 242, 254, 1)) drop-shadow(0 0 35px rgba(255, 0, 102, 0.8)) drop-shadow(0 0 50px rgba(0, 242, 254, 0.6));
+            }
+        }
+
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .subtitle {
+            font-size: 1.8em;
+            font-weight: 300;
+            text-align: center;
+            color: #00f2fe;
+            letter-spacing: 8px;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px #00f2fe;
+        }
+
+        .date {
+            font-size: 1.5em;
+            color: #ff0066;
+            text-align: center;
+            margin-bottom: 40px;
+            text-shadow: 0 0 10px #ff0066;
+        }
+
+        /* DJ Highlight */
+        .dj-section {
+            background: linear-gradient(135deg, rgba(0, 242, 254, 0.1), rgba(255, 0, 102, 0.1));
+            border: 2px solid #00f2fe;
+            border-radius: 20px;
+            padding: 40px;
+            margin: 40px 0;
+            max-width: 900px;
+            width: 100%;
+            box-shadow: 0 0 30px rgba(0, 242, 254, 0.5), inset 0 0 30px rgba(255, 0, 102, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dj-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(0, 242, 254, 0.1), transparent);
+            animation: rotate 4s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .dj-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .dj-image {
+            width: 100%;
+            max-width: 500px;
+            height: auto;
+            border-radius: 15px;
+            margin: 20px auto;
+            display: block;
+            box-shadow: 0 0 40px rgba(255, 0, 102, 0.6);
+        }
+
+        .dj-title {
+            font-size: 2.5em;
+            font-weight: 700;
+            text-align: center;
+            color: #ff0066;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px #ff0066;
+        }
+
+        /* Schedule */
+        .schedule {
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #ff0066;
+            border-radius: 20px;
+            padding: 30px;
+            margin: 30px 0;
+            max-width: 700px;
+            width: 100%;
+            box-shadow: 0 0 30px rgba(255, 0, 102, 0.5);
+        }
+
+        .schedule h3 {
+            font-size: 2em;
+            color: #00f2fe;
+            text-align: center;
+            margin-bottom: 25px;
+            text-shadow: 0 0 10px #00f2fe;
+        }
+
+        .schedule-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin: 10px 0;
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 4px solid #00f2fe;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .schedule-item:hover {
+            background: rgba(0, 242, 254, 0.1);
+            transform: translateX(10px);
+        }
+
+        .schedule-item.highlight {
+            border-left-color: #ff0066;
+            background: rgba(255, 0, 102, 0.1);
+        }
+
+        .schedule-time {
+            font-weight: 700;
+            color: #00f2fe;
+            min-width: 160px;
+            font-size: 1.1em;
+        }
+
+        .schedule-event {
+            color: #fff;
+            font-size: 1.1em;
+        }
+
+        .schedule-item.highlight .schedule-event {
+            color: #ff0066;
+            font-weight: 600;
+        }
+
+        /* CTA Button */
+        .cta-button {
+            display: inline-block;
+            padding: 20px 60px;
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #000;
+            background: linear-gradient(135deg, #00f2fe, #ff0066);
+            border: none;
+            border-radius: 50px;
+            text-decoration: none;
+            margin: 40px 0;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 40px rgba(0, 242, 254, 0.6), 0 0 60px rgba(255, 0, 102, 0.4);
+            transition: all 0.3s ease;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .cta-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 60px rgba(0, 242, 254, 0.8), 0 0 80px rgba(255, 0, 102, 0.6);
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transform: rotate(45deg);
+            animation: shimmer 3s linear infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                left: -100%;
+            }
+
+            100% {
+                left: 100%;
+            }
+        }
+
+        .price {
+            font-size: 2.5em;
+            font-weight: 700;
+            text-align: center;
+            color: #00f2fe;
+            margin: 20px 0;
+            text-shadow: 0 0 20px #00f2fe;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .title {
+                font-size: 3em;
+            }
+
+            .subtitle {
+                font-size: 1.2em;
+                letter-spacing: 4px;
+            }
+
+            .date {
+                font-size: 1.2em;
+            }
+
+            .logo {
+                width: 150px;
+                height: 150px;
+            }
+
+            .dj-section {
+                padding: 25px;
+            }
+
+            .dj-title {
+                font-size: 1.8em;
+            }
+
+            .schedule-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .schedule-time {
+                margin-bottom: 5px;
+            }
+
+            .cta-button {
+                padding: 15px 40px;
+                font-size: 1.2em;
+            }
+
+            .price {
+                font-size: 2em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .title {
+                font-size: 2.5em;
+            }
+
+            .schedule {
+                padding: 20px;
+            }
+
+            .schedule h3 {
+                font-size: 1.5em;
+            }
+
+            .schedule-time,
+            .schedule-event {
+                font-size: 1em;
+            }
+        }
+
+        /* Stamp Badge */
+        .stamp-badge {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.9);
+            border: 3px solid #00f2fe;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.6), 0 0 40px rgba(255, 0, 102, 0.4);
+            animation: stampPulse 3s ease-in-out infinite;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .stamp-badge:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .stamp-text {
+            text-align: center;
+            font-size: 0.75em;
+            font-weight: 700;
+            color: #00f2fe;
+            text-transform: uppercase;
+            line-height: 1.3;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px #00f2fe;
+        }
+
+        @keyframes stampPulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 20px rgba(0, 242, 254, 0.6), 0 0 40px rgba(255, 0, 102, 0.4);
+            }
+
+            50% {
+                box-shadow: 0 0 30px rgba(0, 242, 254, 0.8), 0 0 60px rgba(255, 0, 102, 0.6);
+            }
+        }
+
+        /* About Section */
+        .about-section {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #00f2fe;
+            border-radius: 20px;
+            padding: 40px;
+            margin: 40px 0;
+            box-shadow: 0 0 30px rgba(0, 242, 254, 0.4);
+        }
+
+        .about-section h2 {
+            font-size: 2.2em;
+            color: #00f2fe;
+            margin-bottom: 20px;
+            text-align: center;
+            text-shadow: 0 0 15px #00f2fe;
+        }
+
+        .about-section p {
+            font-size: 1.1em;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.9);
+            text-align: justify;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .stamp-badge {
+                width: 100px;
+                height: 100px;
+                top: 20px;
+                left: 20px;
+            }
+
+            .stamp-text {
+                font-size: 0.6em;
+            }
+
+            .about-section {
+                padding: 25px;
+            }
+
+            .about-section h2 {
+                font-size: 1.8em;
+            }
+
+            .about-section p {
+                font-size: 1em;
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-wrapper">
+        <img src="images/bg.jpg" alt="Background" class="bg-image">
+        <div class="bg-overlay"></div>
+    </div>
+
+    <div class="container">
+        <div class="logo-container">
+            <img src="images/logo.png" alt="Tarang#1 Logo" class="logo">
+        </div>
+
+        <h1 class="title">TARANG#1</h1>
+        <div class="subtitle">MUSICAL EVENING</div>
+        <div class="date">📅 MARCH 7, 2026</div>
+
+        <div class="dj-section">
+            <div class="dj-content">
+                <h2 class="dj-title">🎧 FEATURING DJ EVENING 🎧</h2>
+                <img src="images/dj.jpg" alt="DJ Night" class="dj-image">
+                <p style="text-align: center; font-size: 1.2em; margin-top: 20px; color: #00f2fe;">
+                    Live Band • Sing-Along Piano • DJ Session
+                </p>
+            </div>
+        </div>
+
+        <div class="about-section">
+            <h2>📖 About This Event</h2>
+            <p>
+                Musical Evening is a student-initiated cultural program aimed at promoting musical talent and cultural
+                engagement within the college.
+            </p>
+            <p>
+                The event is organized with the vision of strengthening the cultural environment of our institution and
+                encouraging student participation in the arts.
+            </p>
+            <p>
+                Your support and presence will help us sustain and expand such initiatives in the future.
+            </p>
+        </div>
+
+        <div class="schedule">
+            <h3>🎵 Event Schedule</h3>
+            <div class="schedule-item">
+                <div class="schedule-time">5:00 PM – 5:15 PM</div>
+                <div class="schedule-event">Stage & Sound Setup</div>
+            </div>
+            <div class="schedule-item">
+                <div class="schedule-time">5:15 PM – 5:45 PM</div>
+                <div class="schedule-event">College Band Performance</div>
+            </div>
+            <div class="schedule-item">
+                <div class="schedule-time">5:45 PM – 6:00 PM</div>
+                <div class="schedule-event">Dance / Group Singing</div>
+            </div>
+            <div class="schedule-item">
+                <div class="schedule-time">6:00 PM – 6:15 PM</div>
+                <div class="schedule-event">Break (Refreshments)</div>
+            </div>
+            <div class="schedule-item highlight">
+                <div class="schedule-time">6:15 PM – 7:30 PM</div>
+                <div class="schedule-event">🎹 Sing-Along Piano & DJ Session 🎧</div>
+            </div>
+        </div>
+
+        <div class="price">Entry: ₹85</div>
+
+        <a href="registration.html" class="cta-button">REGISTER NOW</a>
+
+        <p style="text-align: center; opacity: 0.7; margin-top: 20px;">
+            <a href="retrieve.html" style="color: #00f2fe; text-decoration: none; margin: 0 10px;">Retrieve Ticket</a> |
+            <a href="stats.html" style="color: #38ef7d; text-decoration: none; margin: 0 10px;">📊 Statistics</a> |
+            <a href="admin.html" style="color: #ff0066; text-decoration: none; margin: 0 10px;">Admin Login</a>
+        </p>
+    </div>
+
+    <!-- Stamp Badge -->
+    <div class="stamp-badge">
+        <div class="stamp-text">
+            Conducted by<br>Troizeantz'22
+        </div>
+    </div>
+
+    <!-- Configuration -->
+    <script src="config.js"></script>
+    <script>
+        // Update price dynamically from config
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelector('.price').textContent = `Entry: ₹${CONFIG.ticketPrice}`;
+        });
+    </script>
+
+    <!-- Footer Credits -->
+    <div
+        style="position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); font-size: 11px; opacity: 0.5; color: #aaa; font-family: 'Courier New', monospace; z-index: 999; text-align: center;">
+        Licensed to <a href="https://www.instagram.com/sairamkishan30/" target="_blank"
+            style="color: #00f2fe; text-decoration: none;">@sairamkishan</a>
+        <span style="margin: 0 8px;">•</span>
+        <a href="https://www.instagram.com/tarang_svmchri/" target="_blank"
+            style="color: #ff0066; text-decoration: none;">@tarang_svmchri</a>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="images/logo.png">
+    <title>Statistics - Tarang#1</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #000;
+            color: white;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Animated Background */
+        .bg-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .bg-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.3;
+            filter: blur(0.5px);
+        }
+
+        .bg-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(0, 242, 254, 0.3) 0%, rgba(255, 0, 102, 0.3) 100%);
+            mix-blend-mode: multiply;
+        }
+
+        /* Animations */
+        @keyframes neonPulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 20px rgba(0, 242, 254, 0.5), 0 0 40px rgba(255, 0, 102, 0.3);
+            }
+
+            50% {
+                box-shadow: 0 0 30px rgba(0, 242, 254, 0.8), 0 0 60px rgba(255, 0, 102, 0.5);
+            }
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.05);
+                opacity: 0.8;
+            }
+        }
+
+        /* Container */
+        .container {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .header h1 {
+            font-size: 3.5em;
+            font-weight: 900;
+            background: linear-gradient(90deg, #00f2fe, #ff0066, #00f2fe);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+        }
+
+        .header .subtitle {
+            font-size: 1.3em;
+            color: #00f2fe;
+            letter-spacing: 3px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px #00f2fe;
+        }
+
+        .header p {
+            color: #ff0066;
+            font-size: 1.1em;
+            text-shadow: 0 0 8px #ff0066;
+        }
+
+        /* Event Info */
+        .event-info {
+            background: linear-gradient(135deg, rgba(0, 242, 254, 0.1), rgba(255, 0, 102, 0.1));
+            border: 2px solid #00f2fe;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 40px;
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 0 30px rgba(0, 242, 254, 0.4);
+            animation: neonPulse 3s ease-in-out infinite;
+        }
+
+        .event-info h3 {
+            color: #00f2fe;
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px #00f2fe;
+        }
+
+        .event-info .date {
+            color: #ff0066;
+            font-size: 1.2em;
+            font-weight: 600;
+            text-shadow: 0 0 8px #ff0066;
+            margin-bottom: 10px;
+        }
+
+        .event-info .price {
+            color: white;
+            font-size: 1.1em;
+            margin-top: 10px;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            max-width: 900px;
+            width: 100%;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 40px 30px;
+            border-radius: 20px;
+            text-align: center;
+            border: 2px solid;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+            animation: rotate 4s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .stat-card:hover {
+            transform: translateY(-10px) scale(1.05);
+        }
+
+        .stat-card.verified {
+            border-color: #00f2fe;
+            box-shadow: 0 0 30px rgba(0, 242, 254, 0.5);
+        }
+
+        .stat-card.pending {
+            border-color: #ff0066;
+            box-shadow: 0 0 30px rgba(255, 0, 102, 0.5);
+        }
+
+        .stat-card.revenue {
+            border-color: #38ef7d;
+            box-shadow: 0 0 30px rgba(56, 239, 125, 0.5);
+        }
+
+        .stat-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-number {
+            font-size: 4em;
+            font-weight: 900;
+            margin-bottom: 15px;
+            line-height: 1;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card.verified .stat-number {
+            color: #00f2fe;
+            text-shadow: 0 0 20px #00f2fe;
+        }
+
+        .stat-card.pending .stat-number {
+            color: #ff0066;
+            text-shadow: 0 0 20px #ff0066;
+        }
+
+        .stat-card.revenue .stat-number {
+            color: #38ef7d;
+            text-shadow: 0 0 20px #38ef7d;
+        }
+
+        .stat-label {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* Loader */
+        .loader {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid #00f2fe;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Last Updated */
+        .last-updated {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9em;
+            margin-top: 20px;
+        }
+
+        .refresh-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: #38ef7d;
+            border-radius: 50%;
+            margin-right: 10px;
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 10px #38ef7d;
+        }
+
+        /* Links */
+        .links {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 2px solid rgba(0, 242, 254, 0.3);
+        }
+
+        .links a {
+            color: #00f2fe;
+            text-decoration: none;
+            font-weight: 600;
+            margin: 0 20px;
+            transition: all 0.3s ease;
+            text-shadow: 0 0 5px rgba(0, 242, 254, 0.5);
+        }
+
+        .links a:hover {
+            color: #ff0066;
+            text-shadow: 0 0 10px #ff0066;
+        }
+
+        /* Error Message */
+        .error-message {
+            background: rgba(255, 0, 102, 0.2);
+            border: 2px solid #ff0066;
+            color: #ff0066;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            display: none;
+            max-width: 600px;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(255, 0, 102, 0.3);
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5em;
+            }
+
+            .header .subtitle {
+                font-size: 1.1em;
+                letter-spacing: 2px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-number {
+                font-size: 3em;
+            }
+
+            .links a {
+                display: block;
+                margin: 10px 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .stat-number {
+                font-size: 2.5em;
+            }
+
+            .stat-card {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-wrapper">
+        <img src="images/bg.jpg" alt="Background" class="bg-image">
+        <div class="bg-overlay"></div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>📊 LIVE STATISTICS</h1>
+            <div class="subtitle">TARANG#1</div>
+            <p>Real-time ticket analytics</p>
+        </div>
+
+        <div class="event-info">
+            <h3>Musical Evening</h3>
+            <div class="date">March 7, 2026</div>
+            <p class="price">Ticket Price: <strong>₹85</strong></p>
+        </div>
+
+        <div class="error-message" id="errorMessage">
+            Failed to load statistics. Retrying...
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card verified">
+                <div class="stat-content">
+                    <div class="stat-number" id="totalVerified">
+                        <span class="loader"></span>
+                    </div>
+                    <div class="stat-label">Tickets Verified</div>
+                </div>
+            </div>
+
+            <div class="stat-card pending">
+                <div class="stat-content">
+                    <div class="stat-number" id="totalPending">
+                        <span class="loader"></span>
+                    </div>
+                    <div class="stat-label">Pending Verification</div>
+                </div>
+            </div>
+
+            <div class="stat-card revenue">
+                <div class="stat-content">
+                    <div class="stat-number" id="totalAmount">
+                        <span class="loader"></span>
+                    </div>
+                    <div class="stat-label">Total Revenue</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="last-updated">
+            <span class="refresh-indicator"></span>
+            <span id="lastUpdated">Loading...</span>
+        </div>
+
+        <div class="links">
+            <a href="index.html">← Back to Event</a>
+            <a href="admin.html">👤 Admin Panel</a>
+        </div>
+    </div>
+
+    <!-- Configuration -->
+    <script src="config.js"></script>
+
+    <script>
+        const API_URL = CONFIG.apiUrl;
+        const REFRESH_INTERVAL = 30000; // 30 seconds
+
+        let refreshTimer = null;
+
+        // Update price from CONFIG
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelector('.price strong').textContent = `₹${CONFIG.ticketPrice}`;
+        });
+
+        // Load statistics on page load
+        loadStats();
+
+        // Auto-refresh every 30 seconds
+        refreshTimer = setInterval(loadStats, REFRESH_INTERVAL);
+
+        // Refresh when page becomes visible again
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                loadStats();
+            }
+        });
+
+        async function loadStats() {
+            const errorMessage = document.getElementById('errorMessage');
+
+            try {
+                const response = await fetch(`${API_URL}?action=getStats`);
+                const data = await response.json();
+
+                if (data.success) {
+                    // Update statistics with animation
+                    updateStat('totalVerified', data.totalVerified);
+                    updateStat('totalPending', data.totalPending);
+                    updateStat('totalAmount', `₹${data.totalAmount.toLocaleString('en-IN')}`);
+
+                    // Update last updated time
+                    const now = new Date();
+                    document.getElementById('lastUpdated').textContent =
+                        `Last updated: ${now.toLocaleTimeString('en-IN')} - Auto-refreshes every 30s`;
+
+                    // Hide error message if visible
+                    errorMessage.style.display = 'none';
+                } else {
+                    throw new Error(data.error || 'Failed to load statistics');
+                }
+            } catch (error) {
+                console.error('Error loading stats:', error);
+                errorMessage.style.display = 'block';
+                errorMessage.textContent = `Error: ${error.message}. Retrying in 30 seconds...`;
+            }
+        }
+
+        function updateStat(elementId, value) {
+            const element = document.getElementById(elementId);
+
+            // Fade animation
+            element.style.opacity = '0.5';
+
+            setTimeout(() => {
+                element.textContent = value;
+                element.style.opacity = '1';
+            }, 200);
+        }
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (refreshTimer) {
+                clearInterval(refreshTimer);
+            }
+        });
+    </script>
+</body>
+
+</html>

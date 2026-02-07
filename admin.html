@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="images/logo.png">
+    <title>Admin Panel - Tarang#1</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #000;
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .bg-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .bg-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.3;
+            filter: blur(0.5px);
+        }
+
+        .bg-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(0, 242, 254, 0.3) 0%, rgba(255, 0, 102, 0.3) 100%);
+            mix-blend-mode: multiply;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Login Card */
+        .login-card {
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #00f2fe;
+            border-radius: 20px;
+            box-shadow: 0 0 40px rgba(0, 242, 254, 0.5);
+            padding: 50px 40px;
+            text-align: center;
+            margin-top: 80px;
+        }
+
+        .header {
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            font-weight: 900;
+            background: linear-gradient(90deg, #00f2fe, #ff0066);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.95em;
+        }
+
+        /* Admin Panel */
+        .admin-panel {
+            display: none;
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #00f2fe;
+            border-radius: 20px;
+            box-shadow: 0 0 40px rgba(0, 242, 254, 0.5);
+            padding: 30px;
+            margin-top: 20px;
+        }
+
+        .user-info {
+            background: linear-gradient(135deg, rgba(0, 242, 254, 0.2), rgba(255, 0, 102, 0.2));
+            border: 2px solid #00f2fe;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.3);
+        }
+
+        .user-email {
+            font-weight: 600;
+            color: #00f2fe;
+        }
+
+        .logout-btn {
+            background: rgba(255, 0, 102, 0.2);
+            border: 2px solid #ff0066;
+            color: #ff0066;
+            padding: 8px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #ff0066;
+            color: #000;
+            box-shadow: 0 0 20px rgba(255, 0, 102, 0.6);
+        }
+
+        /* Scanner Container */
+        .scanner-container {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid #00f2fe;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.3);
+        }
+
+        .scanner-container h3 {
+            color: #00f2fe;
+            margin-bottom: 15px;
+            text-shadow: 0 0 8px #00f2fe;
+        }
+
+        #reader {
+            border-radius: 10px;
+            overflow: hidden;
+            background: black;
+        }
+
+        /* Manual Input */
+        .manual-input {
+            margin-top: 25px;
+        }
+
+        .manual-input h3 {
+            color: #00f2fe;
+            margin-bottom: 15px;
+            text-shadow: 0 0 8px #00f2fe;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-group input {
+            flex: 1;
+            padding: 14px 18px;
+            border: 2px solid #444;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            font-size: 1em;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #00f2fe;
+            background: rgba(0, 242, 254, 0.1);
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.4);
+        }
+
+        .verify-btn {
+            padding: 14px 30px;
+            background: linear-gradient(135deg, #00f2fe, #ff0066);
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.5);
+        }
+
+        .verify-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(0, 242, 254, 0.7);
+        }
+
+        .verify-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Result Card */
+        .result-card {
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 25px;
+            font-weight: 600;
+            text-align: center;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-verified {
+            background: rgba(56, 239, 125, 0.2);
+            border: 2px solid #38ef7d;
+            color: #38ef7d;
+            box-shadow: 0 0 30px rgba(56, 239, 125, 0.4);
+        }
+
+        .result-error {
+            background: rgba(255, 0, 102, 0.2);
+            border: 2px solid #ff0066;
+            color: #ff0066;
+            box-shadow: 0 0 30px rgba(255, 0, 102, 0.4);
+        }
+
+        .result-warning {
+            background: rgba(255, 210, 0, 0.2);
+            border: 2px solid #ffd200;
+            color: #ffd200;
+            box-shadow: 0 0 30px rgba(255, 210, 0, 0.4);
+        }
+
+        .result-card h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px currentColor;
+        }
+
+        .result-details {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid rgba(255, 255, 255, 0.2);
+            text-align: left;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+        }
+
+        /* Stats Grid */
+        .stats-section {
+            margin-top: 30px;
+        }
+
+        .stats-section h3 {
+            color: #00f2fe;
+            margin-bottom: 15px;
+            text-shadow: 0 0 8px #00f2fe;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(0, 242, 254, 0.1), rgba(255, 0, 102, 0.1));
+            border: 2px solid #00f2fe;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 30px rgba(0, 242, 254, 0.5);
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: 900;
+            color: #00f2fe;
+            text-shadow: 0 0 15px #00f2fe;
+        }
+
+        .stat-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.85em;
+            margin-top: 8px;
+            font-weight: 600;
+        }
+
+        /* Download Button */
+        .download-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #38ef7d, #11998e);
+            color: #000;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1em;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(56, 239, 125, 0.4);
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(56, 239, 125, 0.6);
+        }
+
+        /* Loader */
+        .loader {
+            display: none;
+            width: 35px;
+            height: 35px;
+            border: 4px solid rgba(0, 242, 254, 0.2);
+            border-top: 4px solid #00f2fe;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Links */
+        .links {
+            text-align: center;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 2px solid rgba(0, 242, 254, 0.3);
+        }
+
+        .links a {
+            color: #00f2fe;
+            text-decoration: none;
+            font-weight: 600;
+            margin: 0 15px;
+            transition: all 0.3s ease;
+            text-shadow: 0 0 5px rgba(0, 242, 254, 0.5);
+        }
+
+        .links a:hover {
+            color: #ff0066;
+            text-shadow: 0 0 10px #ff0066;
+        }
+
+        /* Access Denied */
+        .access-denied {
+            display: none;
+            background: rgba(255, 0, 102, 0.2);
+            border: 2px solid #ff0066;
+            color: #ff0066;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(255, 0, 102, 0.3);
+        }
+
+        #g_id_onload {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+
+            .login-card,
+            .admin-panel {
+                padding: 30px 25px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .links a {
+                display: block;
+                margin: 10px 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-wrapper">
+        <img src="images/bg.jpg" alt="Background" class="bg-image">
+        <div class="bg-overlay"></div>
+    </div>
+
+    <div class="container">
+        <!-- Login Card -->
+        <div class="login-card" id="loginCard">
+            <div class="header">
+                <h1>🔐 ADMIN PANEL</h1>
+                <p>Sign in with your authorized Google account</p>
+            </div>
+
+            <div id="g_id_onload"
+                data-client_id="1011495957114-jftfnap62g44g6a6l50psgc615tatckr.apps.googleusercontent.com"
+                data-callback="handleCredentialResponse" data-auto_prompt="false">
+            </div>
+
+            <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline"
+                data-text="sign_in_with" data-shape="rectangular" data-logo_alignment="left">
+            </div>
+
+            <div class="access-denied" id="accessDenied">
+                <h3>❌ Access Denied</h3>
+                <p>Your email is not authorized. Please contact the administrator.</p>
+            </div>
+
+            <div class="links">
+                <a href="index.html">← Back to Event</a>
+                <a href="stats.html">📊 Statistics</a>
+            </div>
+        </div>
+
+        <!-- Admin Panel -->
+        <div class="admin-panel" id="adminPanel">
+            <div class="header">
+                <h1>🎫 TICKET VERIFICATION</h1>
+                <p>Scan or enter UTR to verify tickets</p>
+            </div>
+
+            <div class="user-info">
+                <div>
+                    <span>Logged in as: </span>
+                    <span class="user-email" id="userEmail"></span>
+                </div>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+
+            <div class="scanner-container">
+                <h3>📷 Scan QR Code</h3>
+                <div id="reader"></div>
+            </div>
+
+            <div class="manual-input">
+                <h3>✍️ Or Enter UTR Manually</h3>
+                <div class="input-group">
+                    <input type="text" id="manualUTR" placeholder="Enter 12-digit UTR">
+                    <button class="verify-btn" onclick="verifyManualUTR()">Verify</button>
+                </div>
+            </div>
+
+            <div class="loader" id="loader"></div>
+            <div id="resultCard" class="result-card"></div>
+
+            <!-- Statistics -->
+            <div class="stats-section" style="margin-bottom: 20px;">
+                <h3 style="font-size: 1.3em; margin-bottom: 15px;">📊 Live Statistics</h3>
+                <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr); gap: 15px;">
+                    <div class="stat-card" style="padding: 15px;">
+                        <div class="stat-number" id="totalVerified" style="font-size: 1.8em;">0</div>
+                        <div class="stat-label" style="font-size: 0.9em;">Verified</div>
+                    </div>
+                    <div class="stat-card" style="padding: 15px;">
+                        <div class="stat-number" id="totalPending" style="font-size: 1.8em;">0</div>
+                        <div class="stat-label" style="font-size: 0.9em;">Pending</div>
+                    </div>
+                    <div class="stat-card" style="padding: 15px;">
+                        <div class="stat-number" id="totalAmount" style="font-size: 1.8em;">₹0</div>
+                        <div class="stat-label" style="font-size: 0.9em;">Total Amount</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pending and Download Buttons -->
+            <button class="download-btn" style="margin-bottom: 15px;" onclick="loadPendingStudents()">
+                � View Pending Students
+            </button>
+            <button class="download-btn" onclick="downloadVerifiedList()">
+                � Download All Verified Students
+            </button>
+            <div id="pendingList" style="display: none;"></div>
+
+            <div class="links">
+                <a href="index.html">← Back to Event</a>
+                <a href="stats.html">📊 Statistics</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Configuration -->
+    <script src="config.js"></script>
+
+    <script>
+        const API_URL = CONFIG.apiUrl;
+
+        // CONFIGURE ALLOWED EMAILS HERE
+        const ALLOWED_EMAILS = CONFIG.adminEmails;
+
+        let html5QrCode = null;
+        let currentUserEmail = '';
+
+        // Google Sign-In callback
+        function handleCredentialResponse(response) {
+            const responsePayload = parseJwt(response.credential);
+            const email = responsePayload.email;
+
+            if (ALLOWED_EMAILS.includes(email)) {
+                currentUserEmail = email;
+                showAdminPanel();
+            } else {
+                document.getElementById('accessDenied').style.display = 'block';
+            }
+        }
+
+        function parseJwt(token) {
+            const base64Url = token.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+            return JSON.parse(jsonPayload);
+        }
+
+        function showAdminPanel() {
+            document.getElementById('loginCard').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'block';
+            document.getElementById('userEmail').textContent = currentUserEmail;
+
+            // Initialize QR scanner
+            initScanner();
+
+            // Load statistics
+            loadStats();
+        }
+
+        function logout() {
+            currentUserEmail = '';
+            document.getElementById('loginCard').style.display = 'block';
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('accessDenied').style.display = 'none';
+
+            if (html5QrCode) {
+                html5QrCode.stop();
+            }
+        }
+
+        function initScanner() {
+            html5QrCode = new Html5Qrcode("reader");
+
+            // Optimized configuration for better QR detection
+            const config = {
+                fps: 30,  // Increased frame rate for faster detection
+                qrbox: 250,  // Fixed size for better detection
+                disableFlip: false,  // Allow horizontal flip for better detection
+                experimentalFeatures: {
+                    useBarCodeDetectorIfSupported: true  // Use native detector if available
+                },
+                showTorchButtonIfSupported: true
+            };
+
+            html5QrCode.start(
+                { facingMode: "environment" },
+                config,
+                (decodedText, decodedResult) => {
+                    // QR code decoded successfully
+                    console.log("QR Code detected:", decodedText);
+
+                    // Pause scanning to prevent multiple scans
+                    html5QrCode.pause(true);
+
+                    // Verify the ticket
+                    verifyUTR(decodedText, true);
+
+                    // Resume scanning after 3 seconds
+                    setTimeout(() => {
+                        if (html5QrCode && html5QrCode.getState() === Html5QrcodeScannerState.PAUSED) {
+                            html5QrCode.resume();
+                        }
+                    }, 3000);
+                },
+                (errorMessage) => {
+                    // Scanning error (ignore - this fires continuously)
+                }
+            ).catch((err) => {
+                console.error("Camera access failed:", err);
+                alert("Camera access denied or not available. Please use manual entry.");
+            });
+        }
+
+        async function verifyManualUTR() {
+            const utr = document.getElementById('manualUTR').value.trim();
+            if (!utr) {
+                showResult('Please enter a UTR number', 'error');
+                return;
+            }
+            await verifyUTR(utr, false);
+        }
+
+        async function verifyUTR(utr, fromScanner) {
+            const loader = document.getElementById('loader');
+            const resultCard = document.getElementById('resultCard');
+
+            loader.style.display = 'block';
+            resultCard.style.display = 'none';
+
+            try {
+                const response = await fetch(`${API_URL}?action=verifyTicket&utr=${encodeURIComponent(utr)}`, {
+                    method: 'POST'
+                });
+
+                const data = await response.json();
+
+                if (data.success && data.status === 'VERIFIED') {
+                    showResult(`
+                        <h3>✅ VERIFIED</h3>
+                        <div class="result-details">
+                            <div class="detail-row">
+                                <span>Ticket ID:</span>
+                                <strong>${data.ticketID}</strong>
+                            </div>
+                            <div class="detail-row">
+                                <span>Name:</span>
+                                <strong>${data.name}</strong>
+                            </div>
+                            <div class="detail-row">
+                                <span>Roll Number:</span>
+                                <strong>${data.rollNumber}</strong>
+                            </div>
+                            <div class="detail-row">
+                                <span>Phone:</span>
+                                <strong>${data.phone}</strong>
+                            </div>
+                        </div>
+                    `, 'verified');
+
+                    // Play success sound
+                    playSound('success');
+
+                    // Reload stats
+                    loadStats();
+                } else if (data.status === 'ALREADY_USED') {
+                    showResult(`
+                        <h3>❌ ALREADY USED</h3>
+                        <p>${data.message}</p>
+                        <p style="margin-top: 10px;">Ticket ID: <strong>${data.ticketID}</strong></p>
+                    `, 'error');
+                    playSound('error');
+                } else if (data.status === 'PAYMENT_NOT_FOUND' || data.status === 'NOT_FOUND') {
+                    showResult(`
+                        <h3>⚠️ PAYMENT NOT FOUND</h3>
+                        <p>${data.message}</p>
+                    `, 'warning');
+                    playSound('error');
+                } else if (data.status === 'INVALID_AMOUNT') {
+                    showResult(`
+                        <h3>❌ INVALID AMOUNT</h3>
+                        <p>${data.message}</p>
+                        <p style="margin-top: 10px;">Paid: <strong>₹${data.actualAmount}</strong> | Required: <strong>₹${data.requiredAmount}</strong></p>
+                    `, 'error');
+                    playSound('error');
+                } else if (data.status === 'PAYMENT_FAILED') {
+                    showResult(`
+                        <h3>❌ PAYMENT FAILED</h3>
+                        <p>${data.message}</p>
+                        <p style="margin-top: 10px;">Status: <strong>${data.paymentStatus}</strong></p>
+                    `, 'error');
+                    playSound('error');
+                } else if (data.status === 'NOT_REGISTERED') {
+                    showResult(`
+                        <h3>⚠️ NOT REGISTERED</h3>
+                        <p>${data.message}</p>
+                    `, 'warning');
+                    playSound('error');
+                } else {
+                    showResult(`
+                        <h3>❌ ERROR</h3>
+                        <p>${data.message || 'Verification failed'}</p>
+                    `, 'error');
+                    playSound('error');
+                }
+            } catch (error) {
+                showResult(`
+                    <h3>❌ ERROR</h3>
+                    <p>${error.message}</p>
+                `, 'error');
+                playSound('error');
+            } finally {
+                loader.style.display = 'none';
+
+                // Clear manual input
+                if (!fromScanner) {
+                    document.getElementById('manualUTR').value = '';
+                }
+            }
+        }
+
+        function showResult(html, type) {
+            const resultCard = document.getElementById('resultCard');
+            resultCard.innerHTML = html;
+            resultCard.className = `result-card result-${type}`;
+            resultCard.style.display = 'block';
+
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                resultCard.style.display = 'none';
+            }, 5000);
+        }
+
+        async function loadStats() {
+            try {
+                const response = await fetch(`${API_URL}?action=getStats`);
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('totalVerified').textContent = data.totalVerified;
+                    document.getElementById('totalPending').textContent = data.totalPending;
+                    document.getElementById('totalAmount').textContent = `₹${data.totalAmount}`;
+                }
+            } catch (error) {
+                console.error('Failed to load stats:', error);
+            }
+        }
+
+        function playSound(type) {
+            // Create audio context for sound feedback
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            if (type === 'success') {
+                oscillator.frequency.value = 800;
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+            } else {
+                oscillator.frequency.value = 300;
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            }
+
+            oscillator.start();
+            oscillator.stop(audioContext.currentTime + 0.3);
+        }
+
+
+        async function loadPendingStudents() {
+            const listDiv = document.getElementById('pendingList');
+
+            try {
+                const response = await fetch(`${API_URL}?action=getUnverifiedList`);
+                const data = await response.json();
+
+                if (data.success && data.students && data.students.length > 0) {
+                    let html = '<div style="background: rgba(0,0,0,0.6); border-radius: 15px; padding: 20px; margin-top: 15px;">';
+                    html += `<p style="color: #00f2fe; margin-bottom: 15px; font-size: 1.1em;">Total Unverified: <strong>${data.count}</strong></p>`;
+                    html += '<table style="width: 100%; border-collapse: collapse;">';
+                    html += '<thead><tr style="background: rgba(0,242,254,0.2); color: #00f2fe;">';
+                    html += '<th style="padding: 12px; text-align: left; border-bottom: 2px solid #00f2fe;">Name</th>';
+                    html += '<th style="padding: 12px; text-align: left; border-bottom: 2px solid #00f2fe;">Roll Number</th>';
+                    html += '<th style="padding: 12px; text-align: left; border-bottom: 2px solid #00f2fe;">Batch/Year</th>';
+                    html += '<th style="padding: 12px; text-align: left; border-bottom: 2px solid #00f2fe;">Phone</th>';
+                    html += '</tr></thead><tbody>';
+
+                    data.students.forEach((student, index) => {
+                        const bgColor = index % 2 === 0 ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.3)';
+                        html += `<tr style="background: ${bgColor}; color: #fff;">`;
+                        html += `<td style="padding: 10px; border-bottom: 1px solid rgba(0,242,254,0.1);">${student.name}</td>`;
+                        html += `<td style="padding: 10px; border-bottom: 1px solid rgba(0,242,254,0.1);">${student.rollNumber}</td>`;
+                        html += `<td style="padding: 10px; border-bottom: 1px solid rgba(0,242,254,0.1);">${student.year}</td>`;
+                        html += `<td style="padding: 10px; border-bottom: 1px solid rgba(0,242,254,0.1);">${student.phone}</td>`;
+                        html += '</tr>';
+                    });
+
+                    html += '</tbody></table></div>';
+                    listDiv.innerHTML = html;
+                    listDiv.style.display = 'block';
+                } else {
+                    listDiv.innerHTML = '<p style="color: #38ef7d; padding: 20px; text-align: center; background: rgba(0,0,0,0.6); border-radius: 15px; margin-top: 15px;">No unverified students found</p>';
+                    listDiv.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error loading unverified students:', error);
+                listDiv.innerHTML = '<p style="color: #ff0066; padding: 20px; text-align: center; background: rgba(0,0,0,0.6); border-radius: 15px; margin-top: 15px;">Error loading data</p>';
+                listDiv.style.display = 'block';
+            }
+        }
+
+        async function downloadVerifiedList() {
+            try {
+                const response = await fetch(`${API_URL}?action=getVerifiedList`);
+                const data = await response.json();
+
+                if (data.success && data.students) {
+                    // Convert to CSV
+                    let csv = 'Ticket ID,UTR,Name,Roll Number,Phone,Verified Time\n';
+
+                    data.students.forEach(student => {
+                        const time = new Date(student.verifiedTime).toLocaleString();
+                        csv += `${student.ticketID},${student.utr},"${student.name}",${student.rollNumber},${student.phone},"${time}"\n`;
+                    });
+
+                    // Create download link
+                    const blob = new Blob([csv], { type: 'text/csv' });
+                    const url = window.URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = `tarang-verified-students-${new Date().toISOString().split('T')[0]}.csv`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    window.URL.revokeObjectURL(url);
+
+                    showResult(`
+                        <h3>✅ Download Complete</h3>
+                        <p>Downloaded ${data.count} verified students</p>
+                    `, 'verified');
+                } else {
+                    showResult(`
+                        <h3>❌ Download Failed</h3>
+                        <p>No verified students found</p>
+                    `, 'error');
+                }
+            } catch (error) {
+                showResult(`
+                    <h3>❌ Download Failed</h3>
+                    <p>${error.message}</p>
+                `, 'error');
+            }
+        }
+    </script>
+
+    <!-- Developer Credit -->
+    <div
+        style="position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); font-size: 11px; opacity: 0.5; color: #aaa; font-family: 'Courier New', monospace; z-index: 999;">
+        Developed by <a href="mailto:saimusick204@gmail.com"
+            style="color: #00f2fe; text-decoration: none;">@sairamkishan</a>
+    </div>
+</body>
+
+</html>

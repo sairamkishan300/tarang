@@ -1,0 +1,13 @@
+{
+  "name": "tarang-registration",
+  "version": "1.0.0",
+  "description": "Tarang#1 Musical Evening Registration System",
+  "scripts": {
+    "dev": "npx serve .",
+    "build": "echo 'Static site - no build needed'",
+    "start": "npx serve ."
+  },
+  "keywords": ["event", "registration", "ticketing"],
+  "author": "",
+  "license": "ISC"
+}
