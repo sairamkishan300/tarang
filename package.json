@@ -4,10 +4,14 @@
   "description": "Tarang#1 Musical Evening Registration System",
   "scripts": {
     "dev": "npx serve .",
-    "build": "echo 'Static site - no build needed'",
+    "build": "mkdir public && cp *.html public/ && cp *.js public/ && cp -r images public/",
     "start": "npx serve ."
   },
-  "keywords": ["event", "registration", "ticketing"],
+  "keywords": [
+    "event",
+    "registration",
+    "ticketing"
+  ],
   "author": "",
   "license": "ISC"
 }
