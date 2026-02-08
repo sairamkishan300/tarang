@@ -15,6 +15,21 @@ const CONFIG = {
     supportEmail: "saimusick204@gmail.com",
     supportPhone: "+91 86819 74507",
 
+    // Help & Organization
+    collegeName: "SVMCH&RI",
+    helpContacts: [
+        {
+            name: "Sai Ram Kishan K J",
+            phone: "8681974507",
+            post: "Culturals Secretary"
+        },
+        {
+            name: "Shruthilaya Shree",
+            phone: "73056 21391",
+            post: "Culturals Secretary"
+        }
+    ],
+
     // Google OAuth
     googleClientId: "1011495957114-jftfnap62g44g6a6l50psgc615tatckr.apps.googleusercontent.com",
 
