@@ -722,25 +722,23 @@
     <script>
         const API_URL = CONFIG.apiUrl;
 
-        // CONFIGURE ALLOWED EMAILS HERE
-        const ALLOWED_EMAILS = CONFIG.adminEmails;
-
         let html5QrCode = null;
         let currentUserEmail = '';
+        let currentUserToken = ''; // Store JWT token for backend authentication
         let isScanning = false;
         let scannedUTR = null;
 
         // Google Sign-In callback
         function handleCredentialResponse(response) {
+            // Store the JWT token - backend will validate it
+            currentUserToken = response.credential;
+
             const responsePayload = parseJwt(response.credential);
             const email = responsePayload.email;
+            currentUserEmail = email;
 
-            if (ALLOWED_EMAILS.includes(email)) {
-                currentUserEmail = email;
-                showAdminPanel();
-            } else {
-                document.getElementById('accessDenied').style.display = 'block';
-            }
+            // Show admin panel immediately - backend will verify authorization
+            showAdminPanel();
         }
 
         function parseJwt(token) {
@@ -896,11 +894,26 @@
             resultCard.style.display = 'none';
 
             try {
-                const response = await fetch(`${API_URL}?action=verifyTicket&utr=${encodeURIComponent(utr)}`, {
+                const response = await fetch(`${API_URL}?action=verifyTicket&utr=${encodeURIComponent(utr)}&token=${encodeURIComponent(currentUserToken)}`, {
                     method: 'POST'
                 });
 
                 const data = await response.json();
+
+                // Handle unauthorized access
+                if (!data.success && response.status === 403) {
+                    showResult(`
+                        <h3>🔒 UNAUTHORIZED</h3>
+                        <p>Your account is not authorized to access the admin panel.</p>
+                        <p style="margin-top: 10px; font-size: 0.9em;">Please contact the administrator for access.</p>
+                    `, 'error');
+                    playSound('error');
+                    // Log out the user after 3 seconds
+                    setTimeout(() => {
+                        logout();
+                    }, 3000);
+                    return;
+                }
 
                 if (data.success && data.status === 'VERIFIED') {
                     showResult(`
@@ -1041,7 +1054,7 @@
             const listDiv = document.getElementById('pendingList');
 
             try {
-                const response = await fetch(`${API_URL}?action=getUnverifiedList`);
+                const response = await fetch(`${API_URL}?action=getUnverifiedList&token=${encodeURIComponent(currentUserToken)}`);
                 const data = await response.json();
 
                 if (data.success && data.students && data.students.length > 0) {
@@ -1081,7 +1094,7 @@
 
         async function downloadVerifiedList() {
             try {
-                const response = await fetch(`${API_URL}?action=getVerifiedList`);
+                const response = await fetch(`${API_URL}?action=getVerifiedList&token=${encodeURIComponent(currentUserToken)}`);
                 const data = await response.json();
 
                 if (data.success && data.students) {
