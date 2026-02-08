@@ -157,6 +157,138 @@
             border-radius: 10px;
             overflow: hidden;
             background: black;
+            display: none;
+            margin-top: 15px;
+        }
+
+        .scan-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #00f2fe, #11998e);
+            color: #000;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 25px rgba(0, 242, 254, 0.5);
+        }
+
+        .scan-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 35px rgba(0, 242, 254, 0.7);
+        }
+
+        .scan-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .scan-btn.scanning {
+            background: linear-gradient(135deg, #ff0066, #ff4d94);
+        }
+
+        /* Notification Bar */
+        .notification-bar {
+            display: none;
+            background: linear-gradient(135deg, rgba(0, 242, 254, 0.2), rgba(255, 0, 102, 0.2));
+            border: 2px solid #00f2fe;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 0 30px rgba(0, 242, 254, 0.5);
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .notification-bar h3 {
+            color: #00f2fe;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px #00f2fe;
+            font-size: 1.3em;
+        }
+
+        .ticket-preview {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .preview-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(0, 242, 254, 0.1);
+        }
+
+        .preview-row:last-child {
+            border-bottom: none;
+        }
+
+        .preview-label {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .preview-value {
+            color: #00f2fe;
+            font-weight: 600;
+        }
+
+        .notification-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .confirm-verify-btn {
+            flex: 1;
+            padding: 14px;
+            background: linear-gradient(135deg, #38ef7d, #11998e);
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(56, 239, 125, 0.5);
+        }
+
+        .confirm-verify-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(56, 239, 125, 0.7);
+        }
+
+        .cancel-btn {
+            flex: 1;
+            padding: 14px;
+            background: rgba(255, 0, 102, 0.2);
+            color: #ff0066;
+            border: 2px solid #ff0066;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .cancel-btn:hover {
+            background: #ff0066;
+            color: #000;
+            box-shadow: 0 0 20px rgba(255, 0, 102, 0.6);
         }
 
         /* Manual Input */
@@ -489,8 +621,21 @@
                 <button class="logout-btn" onclick="logout()">Logout</button>
             </div>
 
+            <!-- Notification Bar for Scanned Ticket -->
+            <div class="notification-bar" id="notificationBar">
+                <h3>🎫 Ticket Scanned</h3>
+                <div class="ticket-preview" id="ticketPreview">
+                    <!-- Ticket details will be populated here -->
+                </div>
+                <div class="notification-actions">
+                    <button class="confirm-verify-btn" onclick="confirmVerification()">✅ Verify Ticket</button>
+                    <button class="cancel-btn" onclick="cancelVerification()">❌ Cancel</button>
+                </div>
+            </div>
+
             <div class="scanner-container">
-                <h3>📷 Scan QR Code</h3>
+                <h3>📷 QR Code Scanner</h3>
+                <button class="scan-btn" id="scanBtn" onclick="toggleScanner()">📸 Scan QR Code</button>
                 <div id="reader"></div>
             </div>
 
@@ -551,6 +696,8 @@
 
         let html5QrCode = null;
         let currentUserEmail = '';
+        let isScanning = false;
+        let scannedUTR = null;
 
         // Google Sign-In callback
         function handleCredentialResponse(response) {
@@ -579,9 +726,6 @@
             document.getElementById('adminPanel').style.display = 'block';
             document.getElementById('userEmail').textContent = currentUserEmail;
 
-            // Initialize QR scanner
-            initScanner();
-
             // Load statistics
             loadStats();
         }
@@ -592,52 +736,116 @@
             document.getElementById('adminPanel').style.display = 'none';
             document.getElementById('accessDenied').style.display = 'none';
 
-            if (html5QrCode) {
-                html5QrCode.stop();
+            if (html5QrCode && isScanning) {
+                stopScanner();
             }
         }
 
-        function initScanner() {
-            html5QrCode = new Html5Qrcode("reader");
+        async function toggleScanner() {
+            if (isScanning) {
+                stopScanner();
+            } else {
+                startScanner();
+            }
+        }
 
-            // Optimized configuration for better QR detection
-            const config = {
-                fps: 30,  // Increased frame rate for faster detection
-                qrbox: 250,  // Fixed size for better detection
-                disableFlip: false,  // Allow horizontal flip for better detection
-                experimentalFeatures: {
-                    useBarCodeDetectorIfSupported: true  // Use native detector if available
-                },
-                showTorchButtonIfSupported: true
-            };
+        async function startScanner() {
+            const scanBtn = document.getElementById('scanBtn');
+            const readerDiv = document.getElementById('reader');
 
-            html5QrCode.start(
-                { facingMode: "environment" },
-                config,
-                (decodedText, decodedResult) => {
-                    // QR code decoded successfully
-                    console.log("QR Code detected:", decodedText);
+            try {
+                scanBtn.disabled = true;
+                readerDiv.style.display = 'block';
 
-                    // Pause scanning to prevent multiple scans
-                    html5QrCode.pause(true);
-
-                    // Verify the ticket
-                    verifyUTR(decodedText, true);
-
-                    // Resume scanning after 3 seconds
-                    setTimeout(() => {
-                        if (html5QrCode && html5QrCode.getState() === Html5QrcodeScannerState.PAUSED) {
-                            html5QrCode.resume();
-                        }
-                    }, 3000);
-                },
-                (errorMessage) => {
-                    // Scanning error (ignore - this fires continuously)
+                if (!html5QrCode) {
+                    html5QrCode = new Html5Qrcode("reader");
                 }
-            ).catch((err) => {
+
+                const config = {
+                    fps: 30,
+                    qrbox: 250,
+                    disableFlip: false,
+                    experimentalFeatures: {
+                        useBarCodeDetectorIfSupported: true
+                    },
+                    showTorchButtonIfSupported: true
+                };
+
+                await html5QrCode.start(
+                    { facingMode: "environment" },
+                    config,
+                    (decodedText, decodedResult) => {
+                        console.log("QR Code detected:", decodedText);
+                        scannedUTR = decodedText;
+                        stopScanner();
+                        showNotification(decodedText);
+                    },
+                    (errorMessage) => {
+                        // Scanning error (ignore - fires continuously)
+                    }
+                );
+
+                isScanning = true;
+                scanBtn.textContent = '⏹️ Stop Scanning';
+                scanBtn.classList.add('scanning');
+                scanBtn.disabled = false;
+
+            } catch (err) {
                 console.error("Camera access failed:", err);
                 alert("Camera access denied or not available. Please use manual entry.");
-            });
+                readerDiv.style.display = 'none';
+                scanBtn.disabled = false;
+                scanBtn.textContent = '📸 Scan QR Code';
+            }
+        }
+
+        function stopScanner() {
+            const scanBtn = document.getElementById('scanBtn');
+            const readerDiv = document.getElementById('reader');
+
+            if (html5QrCode && isScanning) {
+                html5QrCode.stop().then(() => {
+                    isScanning = false;
+                    readerDiv.style.display = 'none';
+                    scanBtn.textContent = '📸 Scan QR Code';
+                    scanBtn.classList.remove('scanning');
+                    scanBtn.disabled = false;
+                }).catch(err => {
+                    console.error('Error stopping scanner:', err);
+                });
+            }
+        }
+
+        function showNotification(utr) {
+            const notificationBar = document.getElementById('notificationBar');
+            const ticketPreview = document.getElementById('ticketPreview');
+
+            ticketPreview.innerHTML = `
+                <div class="preview-row">
+                    <span class="preview-label">UTR Number:</span>
+                    <span class="preview-value">${utr}</span>
+                </div>
+                <div class="preview-row">
+                    <span class="preview-label">Status:</span>
+                    <span class="preview-value">Ready to Verify</span>
+                </div>
+            `;
+
+            notificationBar.style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function cancelVerification() {
+            scannedUTR = null;
+            document.getElementById('notificationBar').style.display = 'none';
+        }
+
+        async function confirmVerification() {
+            if (scannedUTR) {
+                document.getElementById('notificationBar').style.display = 'none';
+                await verifyUTR(scannedUTR, true);
+                scannedUTR = null;
+            }
         }
 
         async function verifyManualUTR() {
