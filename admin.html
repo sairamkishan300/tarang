@@ -568,6 +568,37 @@
                 display: block;
                 margin: 10px 0;
             }
+
+            /* Fix user info overflow */
+            .user-info {
+                flex-direction: column;
+                gap: 10px;
+                align-items: stretch;
+                text-align: center;
+            }
+
+            .user-email {
+                word-break: break-all;
+            }
+
+            .logout-btn {
+                width: 100%;
+            }
+
+            /* Fix stat cards overflow */
+            .stat-card {
+                padding: 15px 10px;
+                min-width: 0;
+            }
+
+            .stat-number {
+                font-size: 2em;
+                word-break: break-word;
+            }
+
+            .stat-label {
+                font-size: 0.8em;
+            }
         }
     </style>
 </head>
