@@ -214,6 +214,50 @@
             }
         }
 
+        /* Loading Verification */
+        .loading-verification {
+            display: none;
+            text-align: center;
+            margin-top: 30px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 15px;
+            border: 4px solid rgba(0, 242, 254, 0.2);
+            border-top: 4px solid #00f2fe;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-verification p {
+            color: #00f2fe;
+            font-size: 1em;
+            text-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
+        }
+
         .notification-bar h3 {
             color: #00f2fe;
             margin-bottom: 15px;
@@ -628,6 +672,11 @@
                 data-text="sign_in_with" data-shape="rectangular" data-logo_alignment="left">
             </div>
 
+            <div class="loading-verification" id="loadingVerification">
+                <div class="spinner"></div>
+                <p>Verifying authorization...</p>
+            </div>
+
             <div class="access-denied" id="accessDenied">
                 <h3>❌ Access Denied</h3>
                 <p>Your email is not authorized. Please contact the administrator.</p>
@@ -739,11 +788,17 @@
             const email = responsePayload.email;
             currentUserEmail = email;
 
+            // Show loading spinner
+            document.getElementById('loadingVerification').style.display = 'block';
+
             // IMMEDIATE VALIDATION: Check with backend if this email is authorized
             try {
                 // Make a test API call to verify authorization - use PROTECTED endpoint
                 const testResponse = await fetch(`${API_URL}?action=getVerifiedList&token=${encodeURIComponent(currentUserToken)}`);
                 const testData = await testResponse.json();
+
+                // Hide loading spinner
+                document.getElementById('loadingVerification').style.display = 'none';
 
                 // If response status is 403 or error indicates unauthorized
                 if (testResponse.status === 403 || (!testData.success && testData.error && testData.error.toLowerCase().includes('unauthorized'))) {
@@ -759,6 +814,7 @@
 
             } catch (error) {
                 console.error('Authorization check failed:', error);
+                document.getElementById('loadingVerification').style.display = 'none';
                 document.getElementById('accessDenied').style.display = 'block';
                 currentUserEmail = '';
                 currentUserToken = '';
@@ -789,6 +845,7 @@
             document.getElementById('loginCard').style.display = 'block';
             document.getElementById('adminPanel').style.display = 'none';
             document.getElementById('accessDenied').style.display = 'none';
+            document.getElementById('loadingVerification').style.display = 'none';
 
             if (html5QrCode && isScanning) {
                 stopScanner();
