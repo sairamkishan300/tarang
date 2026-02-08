@@ -741,8 +741,8 @@
 
             // IMMEDIATE VALIDATION: Check with backend if this email is authorized
             try {
-                // Make a test API call to verify authorization
-                const testResponse = await fetch(`${API_URL}?action=getStats&token=${encodeURIComponent(currentUserToken)}`);
+                // Make a test API call to verify authorization - use PROTECTED endpoint
+                const testResponse = await fetch(`${API_URL}?action=getVerifiedList&token=${encodeURIComponent(currentUserToken)}`);
                 const testData = await testResponse.json();
 
                 // If response status is 403 or error indicates unauthorized
