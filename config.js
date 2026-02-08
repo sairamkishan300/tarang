@@ -19,15 +19,7 @@ const CONFIG = {
     googleClientId: "1011495957114-jftfnap62g44g6a6l50psgc615tatckr.apps.googleusercontent.com",
 
     // API Endpoint
-    apiUrl: "https://script.google.com/macros/s/AKfycby0c9tgRgDQpTjLRRxKlziCWLCTiWyFnR615U2FGP-SKyzvJX7F_yVuhSqbI3lJT8tG8g/exec",
-
-    // Admin Emails (authorized users for admin.html)
-    adminEmails: [
-        'saimusick204@gmail.com',
-        'hubiejushu21@gmail.com',
-        'msmouli05@gmail.com',
-        'pavokstudios@gmail.com'
-    ],
+    apiUrl: "https://script.google.com/macros/s/AKfycbwIHVKvP7og4DOmniFmaW9mgH0yqeSfVVO9gUDk7c6nsZTQelCbZM1P-x77I7lwF4xMqg/exec",
 
     // UI Theme Colors
     theme: {
