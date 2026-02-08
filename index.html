@@ -50,6 +50,67 @@
             mix-blend-mode: multiply;
         }
 
+        /* Top Navigation Tabs */
+        .top-nav {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid rgba(0, 242, 254, 0.5);
+            z-index: 1000;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            box-shadow: 0 5px 20px rgba(0, 242, 254, 0.3);
+        }
+
+        .top-nav a {
+            color: #00f2fe;
+            text-decoration: none;
+            padding: 10px 25px;
+            border: 2px solid #00f2fe;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.95em;
+            transition: all 0.3s ease;
+            text-shadow: 0 0 5px rgba(0, 242, 254, 0.5);
+            background: rgba(0, 242, 254, 0.05);
+        }
+
+        .top-nav a:hover {
+            background: #00f2fe;
+            color: #000;
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.8);
+            transform: translateY(-2px);
+        }
+
+        .top-nav a.admin {
+            border-color: #ff0066;
+            color: #ff0066;
+            background: rgba(255, 0, 102, 0.05);
+        }
+
+        .top-nav a.admin:hover {
+            background: #ff0066;
+            color: #000;
+            box-shadow: 0 0 20px rgba(255, 0, 102, 0.8);
+        }
+
+        .top-nav a.stats {
+            border-color: #38ef7d;
+            color: #38ef7d;
+            background: rgba(56, 239, 125, 0.05);
+        }
+
+        .top-nav a.stats:hover {
+            background: #38ef7d;
+            color: #000;
+            box-shadow: 0 0 20px rgba(56, 239, 125, 0.8);
+        }
+
         /* Neon Glow Effects */
         @keyframes neonPulse {
 
@@ -84,7 +145,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 40px 20px;
+            padding: 100px 20px 40px;
         }
 
         /* Logo */
@@ -161,6 +222,87 @@
             text-shadow: 0 0 10px #ff0066;
         }
 
+        /* Registration Section - Moved to top */
+        .registration-section {
+            background: linear-gradient(135deg, rgba(0, 242, 254, 0.15), rgba(255, 0, 102, 0.15));
+            border: 3px solid #00f2fe;
+            border-radius: 25px;
+            padding: 40px;
+            margin: 40px 0;
+            max-width: 700px;
+            width: 100%;
+            box-shadow: 0 0 40px rgba(0, 242, 254, 0.6), inset 0 0 40px rgba(255, 0, 102, 0.2);
+            text-align: center;
+        }
+
+        .price {
+            font-size: 2.5em;
+            font-weight: 700;
+            text-align: center;
+            color: #00f2fe;
+            margin: 20px 0;
+            text-shadow: 0 0 20px #00f2fe;
+        }
+
+        /* CTA Button */
+        .cta-button {
+            display: inline-block;
+            padding: 20px 60px;
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #000;
+            background: linear-gradient(135deg, #00f2fe, #ff0066);
+            border: none;
+            border-radius: 50px;
+            text-decoration: none;
+            margin: 20px 0;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 40px rgba(0, 242, 254, 0.6), 0 0 60px rgba(255, 0, 102, 0.4);
+            transition: all 0.3s ease;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .cta-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 60px rgba(0, 242, 254, 0.8), 0 0 80px rgba(255, 0, 102, 0.6);
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transform: rotate(45deg);
+            animation: shimmer 3s linear infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                left: -100%;
+            }
+
+            100% {
+                left: 100%;
+            }
+        }
+
         /* DJ Highlight */
         .dj-section {
             background: linear-gradient(135deg, rgba(0, 242, 254, 0.1), rgba(255, 0, 102, 0.1));
@@ -218,6 +360,172 @@
             color: #ff0066;
             margin-bottom: 20px;
             text-shadow: 0 0 20px #ff0066;
+        }
+
+        /* About Section - Square/Centered Box */
+        .about-section {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #00f2fe;
+            border-radius: 20px;
+            padding: 40px;
+            margin: 40px auto;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: 0 0 30px rgba(0, 242, 254, 0.4);
+        }
+
+        .about-section h2 {
+            font-size: 2.2em;
+            color: #00f2fe;
+            margin-bottom: 20px;
+            text-align: center;
+            text-shadow: 0 0 15px #00f2fe;
+        }
+
+        .about-section p {
+            font-size: 1.1em;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.9);
+            text-align: justify;
+            margin-bottom: 15px;
+        }
+
+        /* Statistics Section */
+        .statistics-section {
+            background: linear-gradient(135deg, rgba(0, 242, 254, 0.1), rgba(255, 0, 102, 0.1));
+            border: 2px solid #38ef7d;
+            border-radius: 20px;
+            padding: 40px;
+            margin: 40px 0;
+            max-width: 900px;
+            width: 100%;
+            box-shadow: 0 0 30px rgba(56, 239, 125, 0.4);
+        }
+
+        .statistics-section h2 {
+            font-size: 2.5em;
+            color: #38ef7d;
+            text-align: center;
+            margin-bottom: 30px;
+            text-shadow: 0 0 15px #38ef7d;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 30px 20px;
+            border-radius: 15px;
+            text-align: center;
+            border: 2px solid;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px) scale(1.05);
+        }
+
+        .stat-card.verified {
+            border-color: #00f2fe;
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.4);
+        }
+
+        .stat-card.pending {
+            border-color: #ff0066;
+            box-shadow: 0 0 20px rgba(255, 0, 102, 0.4);
+        }
+
+        .stat-card.countdown {
+            border-color: #38ef7d;
+            box-shadow: 0 0 20px rgba(56, 239, 125, 0.4);
+        }
+
+        .stat-number {
+            font-size: 3em;
+            font-weight: 900;
+            margin-bottom: 10px;
+            line-height: 1;
+        }
+
+        .stat-card.verified .stat-number {
+            color: #00f2fe;
+            text-shadow: 0 0 15px #00f2fe;
+        }
+
+        .stat-card.pending .stat-number {
+            color: #ff0066;
+            text-shadow: 0 0 15px #ff0066;
+        }
+
+        .stat-card.countdown .stat-number {
+            color: #38ef7d;
+            text-shadow: 0 0 15px #38ef7d;
+        }
+
+        .stat-label {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.9em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .countdown-display {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .countdown-item {
+            text-align: center;
+        }
+
+        .countdown-number {
+            font-size: 2.5em;
+            font-weight: 900;
+            color: #38ef7d;
+            text-shadow: 0 0 15px #38ef7d;
+            line-height: 1;
+        }
+
+        .countdown-label {
+            font-size: 0.8em;
+            color: rgba(255, 255, 255, 0.8);
+            text-transform: uppercase;
+            margin-top: 5px;
+        }
+
+        .loader {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid #00f2fe;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .last-updated {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.85em;
+            margin-top: 20px;
         }
 
         /* Schedule */
@@ -278,76 +586,19 @@
             font-weight: 600;
         }
 
-        /* CTA Button */
-        .cta-button {
-            display: inline-block;
-            padding: 20px 60px;
-            font-size: 1.5em;
-            font-weight: 700;
-            color: #000;
-            background: linear-gradient(135deg, #00f2fe, #ff0066);
-            border: none;
-            border-radius: 50px;
-            text-decoration: none;
-            margin: 40px 0;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 0 40px rgba(0, 242, 254, 0.6), 0 0 60px rgba(255, 0, 102, 0.4);
-            transition: all 0.3s ease;
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-
-            0%,
-            100% {
-                transform: scale(1);
-            }
-
-            50% {
-                transform: scale(1.05);
-            }
-        }
-
-        .cta-button:hover {
-            transform: scale(1.1);
-            box-shadow: 0 0 60px rgba(0, 242, 254, 0.8), 0 0 80px rgba(255, 0, 102, 0.6);
-        }
-
-        .cta-button::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            transform: rotate(45deg);
-            animation: shimmer 3s linear infinite;
-        }
-
-        @keyframes shimmer {
-            0% {
-                left: -100%;
-            }
-
-            100% {
-                left: 100%;
-            }
-        }
-
-        .price {
-            font-size: 2.5em;
-            font-weight: 700;
-            text-align: center;
-            color: #00f2fe;
-            margin: 20px 0;
-            text-shadow: 0 0 20px #00f2fe;
-        }
-
         /* Mobile Responsive */
         @media (max-width: 768px) {
+            .top-nav {
+                flex-wrap: wrap;
+                padding: 10px;
+                gap: 8px;
+            }
+
+            .top-nav a {
+                padding: 8px 15px;
+                font-size: 0.85em;
+            }
+
             .title {
                 font-size: 3em;
             }
@@ -366,6 +617,7 @@
                 height: 150px;
             }
 
+            .registration-section,
             .dj-section {
                 padding: 25px;
             }
@@ -391,6 +643,35 @@
             .price {
                 font-size: 2em;
             }
+
+            .about-section {
+                padding: 25px;
+            }
+
+            .about-section h2 {
+                font-size: 1.8em;
+            }
+
+            .about-section p {
+                font-size: 1em;
+                text-align: left;
+            }
+
+            .statistics-section h2 {
+                font-size: 2em;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-number {
+                font-size: 2.5em;
+            }
+
+            .countdown-number {
+                font-size: 2em;
+            }
         }
 
         @media (max-width: 480px) {
@@ -409,6 +690,14 @@
             .schedule-time,
             .schedule-event {
                 font-size: 1em;
+            }
+
+            .countdown-display {
+                gap: 10px;
+            }
+
+            .countdown-number {
+                font-size: 1.8em;
             }
         }
 
@@ -459,61 +748,29 @@
             }
         }
 
-        /* About Section */
-        .about-section {
-            background: rgba(0, 0, 0, 0.8);
-            border: 2px solid #00f2fe;
-            border-radius: 20px;
-            padding: 40px;
-            margin: 40px 0;
-            box-shadow: 0 0 30px rgba(0, 242, 254, 0.4);
-        }
-
-        .about-section h2 {
-            font-size: 2.2em;
-            color: #00f2fe;
-            margin-bottom: 20px;
-            text-align: center;
-            text-shadow: 0 0 15px #00f2fe;
-        }
-
-        .about-section p {
-            font-size: 1.1em;
-            line-height: 1.8;
-            color: rgba(255, 255, 255, 0.9);
-            text-align: justify;
-            margin-bottom: 15px;
-        }
-
         @media (max-width: 768px) {
             .stamp-badge {
                 width: 100px;
                 height: 100px;
-                top: 20px;
+                top: 60px;
                 left: 20px;
             }
 
             .stamp-text {
                 font-size: 0.6em;
             }
-
-            .about-section {
-                padding: 25px;
-            }
-
-            .about-section h2 {
-                font-size: 1.8em;
-            }
-
-            .about-section p {
-                font-size: 1em;
-                text-align: left;
-            }
         }
     </style>
 </head>
 
 <body>
+    <!-- Top Navigation Tabs -->
+    <div class="top-nav">
+        <a href="retrieve.html">🎫 Retrieve Ticket</a>
+        <a href="#statistics" class="stats">📊 Statistics</a>
+        <a href="admin.html" class="admin">🔐 Admin Login</a>
+    </div>
+
     <div class="bg-wrapper">
         <img src="images/bg.jpg" alt="Background" class="bg-image">
         <div class="bg-overlay"></div>
@@ -528,6 +785,12 @@
         <div class="subtitle">MUSICAL EVENING</div>
         <div class="date">📅 MARCH 7, 2026</div>
 
+        <!-- Registration Section - Moved to Top -->
+        <div class="registration-section">
+            <div class="price">Entry: ₹85</div>
+            <a href="registration.html" class="cta-button">REGISTER NOW</a>
+        </div>
+
         <div class="dj-section">
             <div class="dj-content">
                 <h2 class="dj-title">🎧 FEATURING DJ EVENING 🎧</h2>
@@ -538,6 +801,7 @@
             </div>
         </div>
 
+        <!-- About Section - Square/Centered Box -->
         <div class="about-section">
             <h2>📖 About This Event</h2>
             <p>
@@ -551,6 +815,51 @@
             <p>
                 Your support and presence will help us sustain and expand such initiatives in the future.
             </p>
+        </div>
+
+        <!-- Statistics Section - Integrated from stats.html -->
+        <div class="statistics-section" id="statistics">
+            <h2>📊 Live Statistics</h2>
+
+            <div class="stats-grid">
+                <div class="stat-card verified">
+                    <div class="stat-number" id="totalVerified">
+                        <span class="loader"></span>
+                    </div>
+                    <div class="stat-label">Tickets Verified</div>
+                </div>
+
+                <div class="stat-card pending">
+                    <div class="stat-number" id="totalPending">
+                        <span class="loader"></span>
+                    </div>
+                    <div class="stat-label">Pending Verification</div>
+                </div>
+
+                <div class="stat-card countdown">
+                    <div class="countdown-display" id="countdown">
+                        <div class="countdown-item">
+                            <div class="countdown-number" id="days">-</div>
+                            <div class="countdown-label">Days</div>
+                        </div>
+                        <div class="countdown-item">
+                            <div class="countdown-number" id="hours">-</div>
+                            <div class="countdown-label">Hours</div>
+                        </div>
+                        <div class="countdown-item">
+                            <div class="countdown-number" id="minutes">-</div>
+                            <div class="countdown-label">Minutes</div>
+                        </div>
+                        <div class="countdown-item">
+                            <div class="countdown-number" id="seconds">-</div>
+                            <div class="countdown-label">Seconds</div>
+                        </div>
+                    </div>
+                    <div class="stat-label" style="margin-top: 15px;">Time Remaining</div>
+                </div>
+            </div>
+
+            <div class="last-updated" id="lastUpdated">Loading...</div>
         </div>
 
         <div class="schedule">
@@ -576,16 +885,6 @@
                 <div class="schedule-event">🎹 Sing-Along Piano & DJ Session 🎧</div>
             </div>
         </div>
-
-        <div class="price">Entry: ₹85</div>
-
-        <a href="registration.html" class="cta-button">REGISTER NOW</a>
-
-        <p style="text-align: center; opacity: 0.7; margin-top: 20px;">
-            <a href="retrieve.html" style="color: #00f2fe; text-decoration: none; margin: 0 10px;">Retrieve Ticket</a> |
-            <a href="stats.html" style="color: #38ef7d; text-decoration: none; margin: 0 10px;">📊 Statistics</a> |
-            <a href="admin.html" style="color: #ff0066; text-decoration: none; margin: 0 10px;">Admin Login</a>
-        </p>
     </div>
 
     <!-- Stamp Badge -->
@@ -598,10 +897,73 @@
     <!-- Configuration -->
     <script src="config.js"></script>
     <script>
+        const API_URL = CONFIG.apiUrl;
+        const EVENT_DATE = new Date('2026-03-07T17:00:00+05:30'); // Event start time: 5:00 PM IST
+
         // Update price dynamically from config
         document.addEventListener('DOMContentLoaded', () => {
             document.querySelector('.price').textContent = `Entry: ₹${CONFIG.ticketPrice}`;
+
+            // Start countdown
+            updateCountdown();
+            setInterval(updateCountdown, 1000);
+
+            // Load statistics
+            loadStats();
+            setInterval(loadStats, 30000); // Refresh every 30 seconds
         });
+
+        // Countdown timer
+        function updateCountdown() {
+            const now = new Date();
+            const diff = EVENT_DATE - now;
+
+            if (diff <= 0) {
+                document.getElementById('days').textContent = '0';
+                document.getElementById('hours').textContent = '0';
+                document.getElementById('minutes').textContent = '0';
+                document.getElementById('seconds').textContent = '0';
+                return;
+            }
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            document.getElementById('days').textContent = days;
+            document.getElementById('hours').textContent = hours;
+            document.getElementById('minutes').textContent = minutes;
+            document.getElementById('seconds').textContent = seconds;
+        }
+
+        // Load statistics
+        async function loadStats() {
+            try {
+                const response = await fetch(`${API_URL}?action=getStats`);
+                const data = await response.json();
+
+                if (data.success) {
+                    updateStat('totalVerified', data.totalVerified);
+                    updateStat('totalPending', data.totalPending);
+
+                    const now = new Date();
+                    document.getElementById('lastUpdated').textContent =
+                        `Last updated: ${now.toLocaleTimeString('en-IN')} - Auto-refreshes every 30s`;
+                }
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        function updateStat(elementId, value) {
+            const element = document.getElementById(elementId);
+            element.style.opacity = '0.5';
+            setTimeout(() => {
+                element.textContent = value;
+                element.style.opacity = '1';
+            }, 200);
+        }
     </script>
 
     <!-- Footer Credits -->
