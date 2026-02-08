@@ -425,6 +425,8 @@
         }
 
         .stats-grid {
+
+
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 15px;
@@ -717,7 +719,7 @@
     </div>
 
     <!-- Configuration -->
-    <script src="config.js"></script>
+    <script src="config.js?v=2.0"></script>
 
     <script>
         const API_URL = CONFIG.apiUrl;
@@ -729,16 +731,38 @@
         let scannedUTR = null;
 
         // Google Sign-In callback
-        function handleCredentialResponse(response) {
-            // Store the JWT token - backend will validate it
+        async function handleCredentialResponse(response) {
+            // Store the JWT token
             currentUserToken = response.credential;
 
             const responsePayload = parseJwt(response.credential);
             const email = responsePayload.email;
             currentUserEmail = email;
 
-            // Show admin panel immediately - backend will verify authorization
-            showAdminPanel();
+            // IMMEDIATE VALIDATION: Check with backend if this email is authorized
+            try {
+                // Make a test API call to verify authorization
+                const testResponse = await fetch(`${API_URL}?action=getStats&token=${encodeURIComponent(currentUserToken)}`);
+                const testData = await testResponse.json();
+
+                // If response status is 403 or error indicates unauthorized
+                if (testResponse.status === 403 || (!testData.success && testData.error && testData.error.toLowerCase().includes('unauthorized'))) {
+                    // User is NOT authorized
+                    document.getElementById('accessDenied').style.display = 'block';
+                    currentUserEmail = '';
+                    currentUserToken = '';
+                    return;
+                }
+
+                // User is authorized - show admin panel
+                showAdminPanel();
+
+            } catch (error) {
+                console.error('Authorization check failed:', error);
+                document.getElementById('accessDenied').style.display = 'block';
+                currentUserEmail = '';
+                currentUserToken = '';
+            }
         }
 
         function parseJwt(token) {
@@ -761,6 +785,7 @@
 
         function logout() {
             currentUserEmail = '';
+            currentUserToken = '';
             document.getElementById('loginCard').style.display = 'block';
             document.getElementById('adminPanel').style.display = 'none';
             document.getElementById('accessDenied').style.display = 'none';
