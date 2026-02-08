@@ -561,7 +561,7 @@
             }
 
             .stats-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: 1fr !important;
             }
 
             .links a {
@@ -684,7 +684,7 @@
             <!-- Statistics -->
             <div class="stats-section" style="margin-bottom: 20px;">
                 <h3 style="font-size: 1.3em; margin-bottom: 15px;">📊 Live Statistics</h3>
-                <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr); gap: 15px;">
+                <div class="stats-grid" style="grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 15px;">
                     <div class="stat-card" style="padding: 15px;">
                         <div class="stat-number" id="totalVerified" style="font-size: 1.8em;">0</div>
                         <div class="stat-label" style="font-size: 0.9em;">Verified</div>
@@ -693,10 +693,10 @@
                         <div class="stat-number" id="totalPending" style="font-size: 1.8em;">0</div>
                         <div class="stat-label" style="font-size: 0.9em;">Pending</div>
                     </div>
-                    <div class="stat-card" style="padding: 15px;">
-                        <div class="stat-number" id="totalAmount" style="font-size: 1.8em;">₹0</div>
-                        <div class="stat-label" style="font-size: 0.9em;">Total Amount</div>
-                    </div>
+                </div>
+                <div class="stat-card" style="padding: 15px;">
+                    <div class="stat-number" id="totalAmount" style="font-size: 1.8em;">₹0</div>
+                    <div class="stat-label" style="font-size: 0.9em;">Total Amount</div>
                 </div>
             </div>
 
