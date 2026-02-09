@@ -1131,13 +1131,13 @@
                     html5QrCode = new Html5Qrcode("reader");
                 }
 
-                // Enhanced configuration optimized for Oppo/OnePlus QR detection
+                // Optimized configuration - Balance of speed and reliability for Oppo
                 const config = {
-                    fps: 5, // Even lower FPS for better processing on Oppo devices
+                    fps: 10, // Balanced FPS for good speed and compatibility
                     qrbox: function (viewfinderWidth, viewfinderHeight) {
-                        // Larger scan box for better detection (80% of viewfinder)
+                        // Optimized scan box - 65% for faster processing
                         let minEdgeSize = Math.min(viewfinderWidth, viewfinderHeight);
-                        let qrboxSize = Math.floor(minEdgeSize * 0.8);
+                        let qrboxSize = Math.floor(minEdgeSize * 0.65);
                         return {
                             width: qrboxSize,
                             height: qrboxSize
@@ -1148,12 +1148,11 @@
                     videoConstraints: {
                         facingMode: { ideal: "environment" },
                         aspectRatio: 1.0,
-                        // Advanced constraints for better autofocus and quality
                         advanced: [{
                             focusMode: "continuous",
                             zoom: 1.0
                         }],
-                        width: { ideal: 1280 },  // Higher resolution for better detection
+                        width: { ideal: 1280 },
                         height: { ideal: 720 }
                     },
                     experimentalFeatures: {
@@ -1163,7 +1162,6 @@
                     formatsToSupport: [
                         Html5QrcodeSupportedFormats.QR_CODE
                     ],
-                    // Additional settings for better detection
                     defaultZoomValueIfSupported: 2,
                     supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA]
                 };
