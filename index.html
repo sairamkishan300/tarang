@@ -1046,7 +1046,9 @@
 
         <!-- Registration Section - Moved to Top -->
         <div class="registration-section">
-            <div class="price" id="priceDisplay"></div>
+            <div class="price" id="priceDisplay">
+                <span style="color: #00f2fe; font-size: 0.8em;">⚙️ Loading...</span>
+            </div>
             <a href="registration.html" class="cta-button">REGISTER NOW</a>
         </div>
 
@@ -1171,6 +1173,8 @@
 
         // Update price dynamically from config with offer support
         document.addEventListener('DOMContentLoaded', async () => {
+            const priceDisplay = document.getElementById('priceDisplay');
+
             // Fetch configuration from Google Sheets
             try {
                 const response = await fetch(`${API_URL}?action=getConfig`);
@@ -1185,7 +1189,6 @@
                 // Continue with defaults if API fails
             }
 
-            const priceDisplay = document.getElementById('priceDisplay');
             const ticketPrice = CONFIG.ticketPrice || 60;
             const offerName = CONFIG.offerName;
             const originalPrice = CONFIG.originalPrice || 100;
