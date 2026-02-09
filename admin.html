@@ -629,14 +629,31 @@
         <!-- Login Card -->
         <div id="loginCard" class="login-card">
             <div class="header">
-                <h1>🔐 Admin Panel</h1>
+                <h1>🔐 ADMIN PANEL</h1>
                 <p>Sign in with your authorized Google account</p>
             </div>
+
             <div id="g_id_onload"
                 data-client_id="1011495957114-jftfnap62g44g6a6l50psgc615tatckr.apps.googleusercontent.com"
-                data-callback="handleCredentialResponse"></div>
-            <div class="g_id_signin" data-type="standard" data-theme="filled_black" data-size="large"
-                data-logo_alignment="left"></div>
+                data-callback="handleCredentialResponse" data-auto_prompt="false">
+            </div>
+
+            <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline"
+                data-text="sign_in_with" data-shape="rectangular" data-logo_alignment="left">
+            </div>
+
+            <div class="loading-verification"
+                style="display: none; text-align: center; margin-top: 30px; animation: fadeIn 0.3s ease;">
+                <div class="spinner"></div>
+                <p style="color: #00f2fe; font-size: 1em; text-shadow: 0 0 10px rgba(0, 242, 254, 0.5);">Verifying
+                    authorization...</p>
+            </div>
+
+            <div class="access-denied"
+                style="display: none; background: rgba(255, 0, 102, 0.2); border: 2px solid #ff0066; color: #ff0066; padding: 20px; border-radius: 15px; margin-top: 20px; text-align: center; box-shadow: 0 0 20px rgba(255, 0, 102, 0.3);">
+                <h3>❌ Access Denied</h3>
+                <p>Your email is not authorized. Please contact the administrator.</p>
+            </div>
         </div>
 
         <!-- Admin Panel -->
@@ -724,38 +741,67 @@
     </div>
 
     <script>
+        const API_URL = CONFIG.apiUrl;
         let authToken = '';
         let userEmail = '';
         let html5QrCode = null;
 
-        // Handle Google Sign-In
-        function handleCredentialResponse(response) {
+        // Google Sign-In callback
+        async function handleCredentialResponse(response) {
+            // Store the JWT token
             authToken = response.credential;
 
-            // Decode JWT to get email
-            const payload = JSON.parse(atob(authToken.split('.')[1]));
-            userEmail = payload.email;
+            const responsePayload = parseJwt(response.credential);
+            const email = responsePayload.email;
+            userEmail = email;
 
-            // Verify with backend
-            verifyAdmin(authToken);
+            // Show loading spinner
+            document.getElementById('loginCard').querySelector('.loading-verification').style.display = 'block';
+
+            // IMMEDIATE VALIDATION: Check with backend if this email is authorized
+            try {
+                // Make a test API call to verify authorization - use PROTECTED endpoint
+                const testResponse = await fetch(`${API_URL}?action=getVerifiedList&token=${encodeURIComponent(authToken)}`);
+                const testData = await testResponse.json();
+
+                // Hide loading spinner
+                document.getElementById('loginCard').querySelector('.loading-verification').style.display = 'none';
+
+                // If response status is 403 or error indicates unauthorized
+                if (testResponse.status === 403 || (!testData.success && testData.error &&
+                    testData.error.toLowerCase().includes('unauthorized'))) {
+                    // User is NOT authorized
+                    document.getElementById('loginCard').querySelector('.access-denied').style.display = 'block';
+                    userEmail = '';
+                    authToken = '';
+                    return;
+                }
+
+                // User is authorized - show admin panel
+                showAdminPanel();
+
+            } catch (error) {
+                console.error('Authorization check failed:', error);
+                document.getElementById('loginCard').querySelector('.loading-verification').style.display = 'none';
+                document.getElementById('loginCard').querySelector('.access-denied').style.display = 'block';
+                userEmail = '';
+                authToken = '';
+            }
         }
 
-        async function verifyAdmin(token) {
-            try {
-                const response = await fetch(`${CONFIG.apiUrl}?action=verifyAdmin&token=${token}`);
-                const data = await response.json();
+        function parseJwt(token) {
+            const base64Url = token.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+            return JSON.parse(jsonPayload);
+        }
 
-                if (data.authorized) {
-                    document.getElementById('loginCard').style.display = 'none';
-                    document.getElementById('adminPanel').style.display = 'block';
-                    document.getElementById('userEmail').textContent = data.email;
-                } else {
-                    alert('❌ Unauthorized! You are not an admin.');
-                    logout();
-                }
-            } catch (error) {
-                alert('Error verifying admin: ' + error.message);
-            }
+        function showAdminPanel() {
+            document.getElementById('loginCard').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'block';
+            document.getElementById('userEmail').textContent = userEmail;
         }
 
         function logout() {
@@ -763,6 +809,8 @@
             userEmail = '';
             document.getElementById('loginCard').style.display = 'block';
             document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('loginCard').querySelector('.access-denied').style.display = 'none';
+            document.getElementById('loginCard').querySelector('.loading-verification').style.display = 'none';
             google.accounts.id.disableAutoSelect();
         }
 
@@ -834,45 +882,45 @@
                 if (data.success && data.ticket) {
                     const t = data.ticket;
                     document.getElementById('scannedResult').innerHTML = `
-                        <div class="notification-bar">
-                            <h3>🎫 Scanned Ticket</h3>
-                            <div class="ticket-preview">
-                                <div class="preview-row">
-                                    <span class="preview-label">Name:</span>
-                                    <span class="preview-value">${t.name}</span>
-                                </div>
-                                <div class="preview-row">
-                                    <span class="preview-label">Phone:</span>
-                                    <span class="preview-value">${t.phone}</span>
-                                </div>
-                                <div class="preview-row">
-                                    <span class="preview-label">Tickets:</span>
-                                    <span class="preview-value">${t.numberOfTickets || 1}</span>
-                                </div>
-                                <div class="preview-row">
-                                    <span class="preview-label">Status:</span>
-                                    <span class="preview-value">${t.status}</span>
-                                </div>
-                            </div>
-                            <div class="notification-actions">
-                                ${t.status === 'PENDING' ? `
-                                    <button class="confirm-verify-btn" onclick="verifyScannedTicket('${t.utr}')">✅ Verify</button>
-                                ` : `
-                                    <div style="text-align:center; width:100%; color:#38ef7d;">✅ Already Verified</div>
-                                `}
-                                <button class="cancel-btn" onclick="document.getElementById('scannedResult').innerHTML=''">Close</button>
-                            </div>
-                        </div>
-                    `;
+    <div class="notification-bar">
+        <h3>🎫 Scanned Ticket</h3>
+        <div class="ticket-preview">
+            <div class="preview-row">
+                <span class="preview-label">Name:</span>
+                <span class="preview-value">${t.name}</span>
+            </div>
+            <div class="preview-row">
+                <span class="preview-label">Phone:</span>
+                <span class="preview-value">${t.phone}</span>
+            </div>
+            <div class="preview-row">
+                <span class="preview-label">Tickets:</span>
+                <span class="preview-value">${t.numberOfTickets || 1}</span>
+            </div>
+            <div class="preview-row">
+                <span class="preview-label">Status:</span>
+                <span class="preview-value">${t.status}</span>
+            </div>
+        </div>
+        <div class="notification-actions">
+            ${t.status === 'PENDING' ? `
+            <button class="confirm-verify-btn" onclick="verifyScannedTicket('${t.utr}')">✅ Verify</button>
+            ` : `
+            <div style="text-align:center; width:100%; color:#38ef7d;">✅ Already Verified</div>
+            `}
+            <button class="cancel-btn" onclick="document.getElementById('scannedResult').innerHTML=''">Close</button>
+        </div>
+    </div>
+    `;
                 } else {
                     document.getElementById('scannedResult').innerHTML = `
-                        <div class="error-message">❌ No ticket found</div>
-                    `;
+    <div class="error-message">❌ No ticket found</div>
+    `;
                 }
             } catch (error) {
                 document.getElementById('scannedResult').innerHTML = `
-                    <div class="error-message">Error: ${error.message}</div>
-                `;
+    <div class="error-message">Error: ${error.message}</div>
+    `;
             }
         }
 
@@ -885,17 +933,17 @@
 
                 if (data.success) {
                     document.getElementById('scannedResult').innerHTML = `
-                        <div class="success-message">✅ ${data.message}</div>
-                    `;
+    <div class="success-message">✅ ${data.message}</div>
+    `;
                 } else {
                     document.getElementById('scannedResult').innerHTML = `
-                        <div class="error-message">❌ ${data.message}</div>
-                    `;
+    <div class="error-message">❌ ${data.message}</div>
+    `;
                 }
             } catch (error) {
                 document.getElementById('scannedResult').innerHTML = `
-                    <div class="error-message">Error: ${error.message}</div>
-                `;
+    <div class="error-message">Error: ${error.message}</div>
+    `;
             }
         }
 
@@ -911,60 +959,60 @@
                 if (data.success && data.ticket) {
                     const t = data.ticket;
                     document.getElementById('manualResult').innerHTML = `
-                        <div class="notification-bar">
-                            <h3>🎫 Ticket Found</h3>
-                            <div class="ticket-preview">
-                                <div class="preview-row">
-                                    <span class="preview-label">Name:</span>
-                                    <span class="preview-value">${t.name}</span>
-                                </div>
-                                <div class="preview-row">
-                                    <span class="preview-label">Roll:</span>
-                                    <span class="preview-value">${t.rollNumber}</span>
-                                </div>
-                                <div class="preview-row">
-                                    <span class="preview-label">Phone:</span>
-                                    <span class="preview-value">${t.phone}</span>
-                                </div>
-                                <div class="preview-row">
-                                    <span class="preview-label">Tickets:</span>
-                                    <span class="preview-value">${t.numberOfTickets || 1}</span>
-                                </div>
-                                <div class="preview-row">
-                                    <span class="preview-label">UTR:</span>
-                                    <span class="preview-value">${t.utr}</span>
-                                </div>
-                                <div class="preview-row">
-                                    <span class="preview-label">Status:</span>
-                                    <span class="preview-value">${t.status}</span>
-                                </div>
-                            </div>
-                            <div class="notification-actions">
-                                ${t.status === 'PENDING' ? `
-                                    <button class="confirm-verify-btn" onclick="verifyScannedTicket('${t.utr}')">✅ Verify</button>
-                                ` : `
-                                    <div style="text-align:center; width:100%; color:#38ef7d;">✅ Already Verified</div>
-                                `}
-                                <button class="cancel-btn" onclick="document.getElementById('manualResult').innerHTML=''">Close</button>
-                            </div>
-                        </div>
-                    `;
+    <div class="notification-bar">
+        <h3>🎫 Ticket Found</h3>
+        <div class="ticket-preview">
+            <div class="preview-row">
+                <span class="preview-label">Name:</span>
+                <span class="preview-value">${t.name}</span>
+            </div>
+            <div class="preview-row">
+                <span class="preview-label">Roll:</span>
+                <span class="preview-value">${t.rollNumber}</span>
+            </div>
+            <div class="preview-row">
+                <span class="preview-label">Phone:</span>
+                <span class="preview-value">${t.phone}</span>
+            </div>
+            <div class="preview-row">
+                <span class="preview-label">Tickets:</span>
+                <span class="preview-value">${t.numberOfTickets || 1}</span>
+            </div>
+            <div class="preview-row">
+                <span class="preview-label">UTR:</span>
+                <span class="preview-value">${t.utr}</span>
+            </div>
+            <div class="preview-row">
+                <span class="preview-label">Status:</span>
+                <span class="preview-value">${t.status}</span>
+            </div>
+        </div>
+        <div class="notification-actions">
+            ${t.status === 'PENDING' ? `
+            <button class="confirm-verify-btn" onclick="verifyScannedTicket('${t.utr}')">✅ Verify</button>
+            ` : `
+            <div style="text-align:center; width:100%; color:#38ef7d;">✅ Already Verified</div>
+            `}
+            <button class="cancel-btn" onclick="document.getElementById('manualResult').innerHTML=''">Close</button>
+        </div>
+    </div>
+    `;
                 } else {
                     document.getElementById('manualResult').innerHTML = `
-                        <div class="error-message">❌ No ticket found for this phone number</div>
-                    `;
+    <div class="error-message">❌ No ticket found for this phone number</div>
+    `;
                 }
             } catch (error) {
                 document.getElementById('manualResult').innerHTML = `
-                    <div class="error-message">Error: ${error.message}</div>
-                `;
+    <div class="error-message">Error: ${error.message}</div>
+    `;
             }
         }
 
         // Check Ticket Status (NEW)
         async function checkTicketStatus() {
             const phone = document.getElementById('statusPhone').value.trim();
-            if (!phone) return alert Enter phone number');
+            if (!phone) return alert('Enter phone number');
 
             try {
                 const response = await fetch(`${CONFIG.apiUrl}?action=getTicketByPhone&phone=${phone}`);
@@ -984,79 +1032,78 @@
                     const difference = paidAmount - requiredAmount;
 
                     document.getElementById('statusResult').innerHTML = `
-                        <div class="status-card ${t.status === 'VERIFIED' ? 'verified' : 'pending'}">
-                            <h3>🎫 Ticket Details</h3>
-                            <div class="detail-row">
-                                <span>Ticket ID:</span>
-                                <span>${t.ticketID || 'Not Generated Yet'}</span>
-                            </div>
-                            <div class="detail-row">
-                                <span>Name:</span>
-                                <span>${t.name}</span>
-                            </div>
-                            <div class="detail-row">
-                                <span>Roll Number:</span>
-                                <span>${t.rollNumber}</span>
-                            </div>
-                            <div class="detail-row">
-                                <span>Batch:</span>
-                                <span>${t.year}</span>
-                            </div>
-                            <div class="detail-row">
-                                <span>Phone:</span>
-                                <span>${t.phone}</span>
-                            </div>
+    <div class="status-card ${t.status === 'VERIFIED' ? 'verified' : 'pending'}">
+        <h3>🎫 Ticket Details</h3>
+        <div class="detail-row">
+            <span>Ticket ID:</span>
+            <span>${t.ticketID || 'Not Generated Yet'}</span>
+        </div>
+        <div class="detail-row">
+            <span>Name:</span>
+            <span>${t.name}</span>
+        </div>
+        <div class="detail-row">
+            <span>Roll Number:</span>
+            <span>${t.rollNumber}</span>
+        </div>
+        <div class="detail-row">
+            <span>Batch:</span>
+            <span>${t.year}</span>
+        </div>
+        <div class="detail-row">
+            <span>Phone:</span>
+            <span>${t.phone}</span>
+        </div>
 
-                            <h4 style="margin-top: 20px;">💰 Payment Information</h4>
-                            <div class="detail-row">
-                                <span>Number of Tickets:</span>
-                                <span>${t.numberOfTickets || 1}</span>
-                            </div>
-                            <div class="detail-row">
-                                <span>Required Amount:</span>
-                                <span>₹${requiredAmount}</span>
-                            </div>
-                            <div class="detail-row">
-                                <span>Paid Amount:</span>
-                                <span>₹${paidAmount}</span>
-                            </div>
-                            ${difference > 0 ? `
-                                <div class="detail-row overpaid">
-                                    <span>⚠️ Overpaid:</span>
-                                    <span>₹${difference} (May be refundable)</span>
-                                </div>
-                            ` : difference < 0 ? `
-                                <div class="detail-row underpaid">
-                                    <span>❌ Underpaid:</span>
-                                    <span>₹${Math.abs(difference)}</span>
-                                </div>
-                            ` : `
-                                <div class="detail-row exact">
-                                    <span>✅ Exact Payment</span>
-                                    <span></span>
-                                </div>
-                            `}
+        <h4 style="margin-top: 20px;">💰 Payment Information</h4>
+        <div class="detail-row">
+            <span>Number of Tickets:</span>
+            <span>${t.numberOfTickets || 1}</span>
+        </div>
+        <div class="detail-row">
+            <span>Required Amount:</span>
+            <span>₹${requiredAmount}</span>
+        </div>
+        <div class="detail-row">
+            <span>Paid Amount:</span>
+            <span>₹${paidAmount}</span>
+        </div>
+        ${difference > 0 ? `
+        <div class="detail-row overpaid">
+            <span>⚠️ Overpaid:</span>
+            <span>₹${difference} (May be refundable)</span>
+        </div>
+        ` : difference < 0 ? ` <div class="detail-row underpaid">
+            <span>❌ Underpaid:</span>
+            <span>₹${Math.abs(difference)}</span>
+    </div>
+    ` : `
+    <div class="detail-row exact">
+        <span>✅ Exact Payment</span>
+        <span></span>
+    </div>
+    `}
 
-                            <h4 style="margin-top: 20px;">📋 Other Information</h4>
-                            <div class="detail-row">
-                                <span>UTR:</span>
-                                <span>${t.utr}</span>
-                            </div>
-                            <div class="detail-row">
-                                <span>Status:</span>
-                                <span style="color: ${t.status === 'VERIFIED' ? '#38ef7d' : '#ffd700'};">${t.status}</span>
-                            </div>
-                        </div>
-                    `;
+    <h4 style="margin-top: 20px;">📋 Other Information</h4>
+    <div class="detail-row">
+        <span>UTR:</span>
+        <span>${t.utr}</span>
+    </div>
+    <div class="detail-row">
+        <span>Status:</span>
+        <span style="color: ${t.status === 'VERIFIED' ? '#38ef7d' : '#ffd700'};">${t.status}</span>
+    </div>
+    </div>
+    `;
                 } else {
                     document.getElementById('statusResult').innerHTML = `
-                        <div class="error-message">❌ No ticket found for this phone number</div>
-                    `;
+    <div class="error-message">❌ No ticket found for this phone number</div>
+    `;
                 }
             } catch (error) {
                 document.getElementById('statusResult').innerHTML = `
-                    <div class="error-message">Error: ${error.message}</div>
-                `;
+    <div class="error-message">Error: ${error.message}</div>
+    `;
             }
         }
 
@@ -1076,42 +1123,42 @@
 
                 if (data.success && data.students && data.students.length > 0) {
                     list.innerHTML = `
-                        <h3 style="color: #00f2fe; margin: 20px 0 15px;">Found ${data.students.length} Pending Registrations</h3>
-                        <div style="overflow-x: auto;">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Roll</th>
-                                        <th>Year</th>
-                                        <th>Phone</th>
-                                        <th>Tickets</th>
-                                        <th>Amount</th>
-                                        <th>UTR</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${data.students.map(s => `
-                                        <tr>
-                                            <td>${s.name}</td>
-                                            <td>${s.rollNumber}</td>
-                                            <td>${s.year}</td>
-                                            <td>${s.phone}</td>
-                                            <td>${s.numberOfTickets || 1}</td>
-                                            <td>₹${s.totalAmount || 60}</td>
-                                            <td style="font-family: monospace;">${s.utr}</td>
-                                        </tr>
-                                    `).join('')}
-                                </tbody>
-                            </table>
-                        </div>
-                    `;
+    <h3 style="color: #00f2fe; margin: 20px 0 15px;">Found ${data.students.length} Pending Registrations</h3>
+    <div style="overflow-x: auto;">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Roll</th>
+                    <th>Year</th>
+                    <th>Phone</th>
+                    <th>Tickets</th>
+                    <th>Amount</th>
+                    <th>UTR</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${data.students.map(s => `
+                <tr>
+                    <td>${s.name}</td>
+                    <td>${s.rollNumber}</td>
+                    <td>${s.year}</td>
+                    <td>${s.phone}</td>
+                    <td>${s.numberOfTickets || 1}</td>
+                    <td>₹${s.totalAmount || 60}</td>
+                    <td style="font-family: monospace;">${s.utr}</td>
+                </tr>
+                `).join('')}
+            </tbody>
+        </table>
+    </div>
+    `;
                 } else {
                     list.innerHTML = `
-                        <div style="text-align:center; padding:30px; color: rgba(255,255,255,0.7);">
-                            ✅ No pending students found. All registrations are verified!
-                        </div>
-                    `;
+    <div style="text-align:center; padding:30px; color: rgba(255,255,255,0.7);">
+        ✅ No pending students found. All registrations are verified!
+    </div>
+    `;
                 }
             } catch (error) {
                 loader.style.display = 'none';
@@ -1137,56 +1184,58 @@
                     const remaining = data.totalCollected - data.totalSpent;
 
                     dataDiv.innerHTML = `
-                        <div class="summary-grid">
-                            <div class="summary-card positive">
-                                <h4>Total Collected</h4>
-                                <div class="summary-amount">₹${data.totalCollected}</div>
-                                <div class="summary-description">${data.verifiedStudents} verified students × ₹${data.ticketPrice}</div>
-                            </div>
-                            <div class="summary-card negative">
-                                <h4>Total Spent</h4>
-                                <div class="summary-amount">₹${data.totalSpent}</div>
-                                <div class="summary-description">${data.expenseCount} expenses</div>
-                            </div>
-                            <div class="summary-card ${remaining >= 0 ? 'positive' : 'negative'}">
-                                <h4>Remaining Balance</h4>
-                                <div class="summary-amount">₹${remaining}</div>
-                                <div class="summary-description">Available funds</div>
-                            </div>
-                        </div>
+    <div class="summary-grid">
+        <div class="summary-card positive">
+            <h4>Total Collected</h4>
+            <div class="summary-amount">₹${data.totalCollected}</div>
+            <div class="summary-description">${data.verifiedStudents} verified students × ₹${data.ticketPrice}</div>
+        </div>
+        <div class="summary-card negative">
+            <h4>Total Spent</h4>
+            <div class="summary-amount">₹${data.totalSpent}</div>
+            <div class="summary-description">${data.expenseCount} expenses</div>
+        </div>
+        <div class="summary-card ${remaining >= 0 ? 'positive' : 'negative'}">
+            <h4>Remaining Balance</h4>
+            <div class="summary-amount">₹${remaining}</div>
+            <div class="summary-description">Available funds</div>
+        </div>
+    </div>
 
-                        ${data.expenses && data.expenses.length > 0 ? `
-                            <h3 style="color: #00f2fe; margin: 20px 0 15px;">📊 Expense Breakdown</h3>
-                            <div style="overflow-x: auto;">
-                                <table class="data-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Date</th>
-                                            <th>Description</th>
-                                            <th>Category</th>
-                                            <th>Amount</th>
-                                            <th>Notes</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        ${data.expenses.map(e => `
-                                            <tr>
-                                                <td>${e.date}</td>
-                                                <td>${e.description}</td>
-                                                <td><span style="background: rgba(0,242,254,0.2); padding: 4px 8px; border-radius: 5px;">${e.category}</span></td>
-                                                <td style="font-weight: 600; color: #ff0066;">₹${e.amount}</td>
-                                                <td style="font-size: 0.85em; color: rgba(255,255,255,0.7);">${e.notes || '-'}</td>
-                                            </tr>
-                                        `).join('')}
-                                    </tbody>
-                                </table>
-                            </div>
-                        ` : `
-                            <div style="text-align:center; padding:30px; color: rgba(255,255,255,0.7);">
-                                📭 No expenses recorded yet
-                            </div>
-                        `}
-                    `;
+    ${data.expenses && data.expenses.length > 0 ? `
+    <h3 style="color: #00f2fe; margin: 20px 0 15px;">📊 Expense Breakdown</h3>
+    <div style="overflow-x: auto;">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Description</th>
+                    <th>Category</th>
+                    <th>Amount</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${data.expenses.map(e => `
+                <tr>
+                    <td>${e.date}</td>
+                    <td>${e.description}</td>
+                    <td><span
+                            style="background: rgba(0,242,254,0.2); padding: 4px 8px; border-radius: 5px;">${e.category}</span>
+                    </td>
+                    <td style="font-weight: 600; color: #ff0066;">₹${e.amount}</td>
+                    <td style="font-size: 0.85em; color: rgba(255,255,255,0.7);">${e.notes || '-'}</td>
+                </tr>
+                `).join('')}
+            </tbody>
+        </table>
+    </div>
+    ` : `
+    <div style="text-align:center; padding:30px; color: rgba(255,255,255,0.7);">
+        📭 No expenses recorded yet
+    </div>
+    `}
+    `;
                 } else {
                     dataDiv.innerHTML = `<div class="error-message">Failed to load: ${data.error}</div>`;
                 }
