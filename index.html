@@ -1175,6 +1175,9 @@
         document.addEventListener('DOMContentLoaded', async () => {
             const priceDisplay = document.getElementById('priceDisplay');
 
+            // Set college name immediately (from local config, not API)
+            document.getElementById('collegeBadge').textContent = CONFIG.collegeName;
+
             // Fetch configuration from Google Sheets
             try {
                 const response = await fetch(`${API_URL}?action=getConfig`);
@@ -1205,9 +1208,6 @@
                 // Show simple price
                 priceDisplay.textContent = `Entry: ₹${ticketPrice}`;
             }
-
-            // Update college name from config
-            document.getElementById('collegeBadge').textContent = CONFIG.collegeName;
 
             // Update help contact info from config
             const contactsList = document.getElementById('helpContactsList');
