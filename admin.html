@@ -10,6 +10,7 @@
         rel="stylesheet">
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="config.js"></script>
     <style>
         * {
             margin: 0;
@@ -56,7 +57,7 @@
         .container {
             position: relative;
             z-index: 1;
-            max-width: 600px;
+            max-width: 900px;
             margin: 0 auto;
             padding: 20px;
         }
@@ -70,10 +71,6 @@
             padding: 50px 40px;
             text-align: center;
             margin-top: 80px;
-        }
-
-        .header {
-            margin-bottom: 30px;
         }
 
         .header h1 {
@@ -98,17 +95,16 @@
             border: 2px solid #00f2fe;
             border-radius: 20px;
             box-shadow: 0 0 40px rgba(0, 242, 254, 0.5);
-            padding: 30px;
+            padding: 25px;
             margin-top: 20px;
         }
 
         .user-info {
             background: linear-gradient(135deg, rgba(0, 242, 254, 0.2), rgba(255, 0, 102, 0.2));
             border: 2px solid #00f2fe;
-            color: white;
             padding: 15px 20px;
             border-radius: 12px;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -118,6 +114,7 @@
         .user-email {
             font-weight: 600;
             color: #00f2fe;
+            font-size: 0.9em;
         }
 
         .logout-btn {
@@ -129,6 +126,7 @@
             cursor: pointer;
             font-weight: 600;
             transition: all 0.3s ease;
+            font-size: 0.85em;
         }
 
         .logout-btn:hover {
@@ -137,75 +135,71 @@
             box-shadow: 0 0 20px rgba(255, 0, 102, 0.6);
         }
 
-        /* Scanner Container */
-        .scanner-container {
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px solid #00f2fe;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 25px;
-            box-shadow: 0 0 20px rgba(0, 242, 254, 0.3);
+        /* Tab Navigation */
+        .tab-navigation {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+            -webkit-overflow-scrolling: touch;
         }
 
-        .scanner-container h3 {
-            color: #00f2fe;
-            margin-bottom: 15px;
-            text-shadow: 0 0 8px #00f2fe;
+        .tab-navigation::-webkit-scrollbar {
+            height: 4px;
         }
 
-        #reader {
+        .tab-navigation::-webkit-scrollbar-track {
+            background: rgba(0, 242, 254, 0.1);
+            border-radius: 2px;
+        }
+
+        .tab-navigation::-webkit-scrollbar-thumb {
+            background: #00f2fe;
+            border-radius: 2px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            min-width: 110px;
+            padding: 12px 10px;
+            background: rgba(0, 242, 254, 0.1);
+            border: 2px solid rgba(0, 242, 254, 0.3);
+            color: rgba(255, 255, 255, 0.7);
             border-radius: 10px;
-            overflow: hidden;
-            background: black;
-            display: none;
-            margin-top: 15px;
-        }
-
-        .scan-btn {
-            width: 100%;
-            padding: 18px;
-            background: linear-gradient(135deg, #00f2fe, #11998e);
-            color: #000;
-            border: none;
-            border-radius: 12px;
-            font-size: 1.2em;
-            font-weight: 700;
             cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85em;
             transition: all 0.3s ease;
-            box-shadow: 0 0 25px rgba(0, 242, 254, 0.5);
+            white-space: nowrap;
         }
 
-        .scan-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 0 35px rgba(0, 242, 254, 0.7);
+        .tab-btn.active {
+            background: linear-gradient(135deg, rgba(0, 242, 254, 0.3), rgba(255, 0, 102, 0.3));
+            border-color: #00f2fe;
+            color: #00f2fe;
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.5);
         }
 
-        .scan-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
+        .tab-btn:hover:not(.active) {
+            border-color: #00f2fe;
+            color: #fff;
         }
 
-        .scan-btn.scanning {
-            background: linear-gradient(135deg, #ff0066, #ff4d94);
-        }
-
-        /* Notification Bar */
-        .notification-bar {
+        /* Tab Content */
+        .tab-content {
             display: none;
-            background: linear-gradient(135deg, rgba(0, 242, 254, 0.2), rgba(255, 0, 102, 0.2));
-            border: 2px solid #00f2fe;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 25px;
-            box-shadow: 0 0 30px rgba(0, 242, 254, 0.5);
-            animation: slideDown 0.3s ease;
+            animation: fadeIn 0.3s ease;
         }
 
-        @keyframes slideDown {
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
             from {
                 opacity: 0;
-                transform: translateY(-20px);
+                transform: translateY(10px);
             }
 
             to {
@@ -214,55 +208,95 @@
             }
         }
 
-        /* Loading Verification */
-        .loading-verification {
-            display: none;
-            text-align: center;
-            margin-top: 30px;
-            animation: fadeIn 0.3s ease;
+        /* Common Elements */
+        .section {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid #00f2fe;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.3);
         }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
-        }
-
-        .spinner {
-            width: 50px;
-            height: 50px;
-            margin: 0 auto 15px;
-            border: 4px solid rgba(0, 242, 254, 0.2);
-            border-top: 4px solid #00f2fe;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        .loading-verification p {
+        .section h3 {
             color: #00f2fe;
-            font-size: 1em;
-            text-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
+            margin-bottom: 15px;
+            text-shadow: 0 0 8px #00f2fe;
+            font-size: 1.2em;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .input-group input {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px 15px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid rgba(0, 242, 254, 0.3);
+            border-radius: 10px;
+            color: white;
+            font-size: 0.95em;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #00f2fe;
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
+        }
+
+        .btn {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #00f2fe, #0099cc);
+            border: none;
+            border-radius: 10px;
+            color: #000;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.5);
+            font-size: 0.95em;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(0, 242, 254, 0.7);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* QR Scanner */
+        #qr-reader {
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        #qr-reader__dashboard_section_swaplink {
+            display: none !important;
+        }
+
+        /* Notification Bar */
+        .notification-bar {
+            background: linear-gradient(135deg, rgba(0, 242, 254, 0.2), rgba(255, 0, 102, 0.2));
+            border: 2px solid #00f2fe;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 0 30px rgba(0, 242, 254, 0.4);
         }
 
         .notification-bar h3 {
             color: #00f2fe;
             margin-bottom: 15px;
             text-shadow: 0 0 10px #00f2fe;
-            font-size: 1.3em;
         }
 
         .ticket-preview {
@@ -277,6 +311,7 @@
             justify-content: space-between;
             padding: 8px 0;
             border-bottom: 1px solid rgba(0, 242, 254, 0.1);
+            font-size: 0.9em;
         }
 
         .preview-row:last-child {
@@ -304,7 +339,6 @@
             color: #000;
             border: none;
             border-radius: 10px;
-            font-size: 1.1em;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -323,7 +357,6 @@
             color: #ff0066;
             border: 2px solid #ff0066;
             border-radius: 10px;
-            font-size: 1.1em;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -335,205 +368,72 @@
             box-shadow: 0 0 20px rgba(255, 0, 102, 0.6);
         }
 
-        /* Manual Input */
-        .manual-input {
-            margin-top: 25px;
-        }
-
-        .manual-input h3 {
-            color: #00f2fe;
-            margin-bottom: 15px;
-            text-shadow: 0 0 8px #00f2fe;
-        }
-
-        .input-group {
-            display: flex;
-            gap: 10px;
-        }
-
-        .input-group input {
-            flex: 1;
-            padding: 14px 18px;
-            border: 2px solid #444;
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.05);
-            color: #fff;
-            font-size: 1em;
-            font-family: 'Poppins', sans-serif;
-            transition: all 0.3s ease;
-        }
-
-        .input-group input:focus {
-            outline: none;
-            border-color: #00f2fe;
-            background: rgba(0, 242, 254, 0.1);
-            box-shadow: 0 0 20px rgba(0, 242, 254, 0.4);
-        }
-
-        .verify-btn {
-            padding: 14px 30px;
-            background: linear-gradient(135deg, #00f2fe, #ff0066);
-            color: #000;
-            border: none;
-            border-radius: 10px;
-            font-size: 1em;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 20px rgba(0, 242, 254, 0.5);
-        }
-
-        .verify-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 0 30px rgba(0, 242, 254, 0.7);
-        }
-
-        .verify-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        /* Result Card */
-        .result-card {
-            padding: 25px;
+        /* Status Card */
+        .status-card {
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid #00f2fe;
             border-radius: 15px;
-            margin-top: 25px;
-            font-weight: 600;
-            text-align: center;
-            display: none;
-            animation: slideIn 0.3s ease;
+            padding: 20px;
+            margin-top: 20px;
         }
 
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .status-card.verified {
+            border-color: #38ef7d;
         }
 
-        .result-verified {
-            background: rgba(56, 239, 125, 0.2);
-            border: 2px solid #38ef7d;
-            color: #38ef7d;
-            box-shadow: 0 0 30px rgba(56, 239, 125, 0.4);
+        .status-card.pending {
+            border-color: #ffd700;
         }
 
-        .result-error {
-            background: rgba(255, 0, 102, 0.2);
-            border: 2px solid #ff0066;
-            color: #ff0066;
-            box-shadow: 0 0 30px rgba(255, 0, 102, 0.4);
-        }
-
-        .result-warning {
-            background: rgba(255, 210, 0, 0.2);
-            border: 2px solid #ffd200;
-            color: #ffd200;
-            box-shadow: 0 0 30px rgba(255, 210, 0, 0.4);
-        }
-
-        .result-card h3 {
-            font-size: 1.5em;
-            margin-bottom: 10px;
-            text-shadow: 0 0 10px currentColor;
-        }
-
-        .result-details {
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 2px solid rgba(255, 255, 255, 0.2);
-            text-align: left;
+        .status-card h3,
+        .status-card h4 {
+            color: #00f2fe;
+            text-shadow: 0 0 10px #00f2fe;
+            margin-bottom: 15px;
+            font-size: 1.1em;
         }
 
         .detail-row {
             display: flex;
             justify-content: space-between;
-            padding: 8px 0;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(0, 242, 254, 0.1);
+            font-size: 0.9em;
         }
 
-        /* Stats Grid */
-        .stats-section {
-            margin-top: 30px;
+        .detail-row:last-child {
+            border-bottom: none;
         }
 
-        .stats-section h3 {
-            color: #00f2fe;
-            margin-bottom: 15px;
-            text-shadow: 0 0 8px #00f2fe;
-        }
-
-        .stats-grid {
-
-
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-        }
-
-        .stat-card {
-            background: linear-gradient(135deg, rgba(0, 242, 254, 0.1), rgba(255, 0, 102, 0.1));
-            border: 2px solid #00f2fe;
-            padding: 20px;
-            border-radius: 15px;
-            text-align: center;
-            box-shadow: 0 0 20px rgba(0, 242, 254, 0.3);
-            transition: all 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 0 30px rgba(0, 242, 254, 0.5);
-        }
-
-        .stat-number {
-            font-size: 2.5em;
-            font-weight: 900;
-            color: #00f2fe;
-            text-shadow: 0 0 15px #00f2fe;
-        }
-
-        .stat-label {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 0.85em;
-            margin-top: 8px;
+        .detail-row.overpaid {
+            color: #ffd700;
             font-weight: 600;
         }
 
-        /* Download Button */
-        .download-btn {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #38ef7d, #11998e);
-            color: #000;
-            border: none;
-            border-radius: 12px;
+        .detail-row.underpaid {
+            color: #ff0066;
+            font-weight: 600;
+        }
+
+        .detail-row.exact {
+            color: #38ef7d;
+            font-weight: 600;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 30px;
+            color: #00f2fe;
             font-size: 1.1em;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: 0 0 20px rgba(56, 239, 125, 0.4);
-            transition: all 0.3s ease;
-            margin-top: 20px;
         }
 
-        .download-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 0 30px rgba(56, 239, 125, 0.6);
-        }
-
-        /* Loader */
-        .loader {
-            display: none;
-            width: 35px;
-            height: 35px;
-            border: 4px solid rgba(0, 242, 254, 0.2);
-            border-top: 4px solid #00f2fe;
+        .spinner {
+            border: 3px solid rgba(0, 242, 254, 0.2);
+            border-top: 3px solid #00f2fe;
             border-radius: 50%;
+            width: 40px;
+            height: 40px;
             animation: spin 1s linear infinite;
             margin: 20px auto;
         }
@@ -548,177 +448,50 @@
             }
         }
 
-        /* Links */
-        .links {
-            text-align: center;
-            margin-top: 25px;
-            padding-top: 20px;
-            border-top: 2px solid rgba(0, 242, 254, 0.3);
-        }
-
-        .links a {
-            color: #00f2fe;
-            text-decoration: none;
-            font-weight: 600;
-            margin: 0 15px;
-            transition: all 0.3s ease;
-            text-shadow: 0 0 5px rgba(0, 242, 254, 0.5);
-        }
-
-        .links a:hover {
-            color: #ff0066;
-            text-shadow: 0 0 10px #ff0066;
-        }
-
-        /* Access Denied */
-        .access-denied {
-            display: none;
-            background: rgba(255, 0, 102, 0.2);
-            border: 2px solid #ff0066;
-            color: #ff0066;
-            padding: 20px;
-            border-radius: 15px;
-            margin-top: 20px;
-            text-align: center;
-            box-shadow: 0 0 20px rgba(255, 0, 102, 0.3);
-        }
-
-        #g_id_onload {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-
-        /* Mobile Responsive */
-        @media (max-width: 768px) {
-
-            .login-card,
-            .admin-panel {
-                padding: 30px 25px;
-            }
-
-            .header h1 {
-                font-size: 2em;
-            }
-
-            .input-group {
-                flex-direction: column;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr !important;
-            }
-
-            .links a {
-                display: block;
-                margin: 10px 0;
-            }
-
-            /* Fix user info overflow */
-            .user-info {
-                flex-direction: column;
-                gap: 10px;
-                align-items: stretch;
-                text-align: center;
-            }
-
-            .user-email {
-                word-break: break-all;
-            }
-
-            .logout-btn {
-                width: 100%;
-            }
-
-            /* Fix stat cards overflow */
-            .stat-card {
-                padding: 15px 10px;
-                min-width: 0;
-            }
-
-            .stat-number {
-                font-size: 2em;
-                word-break: break-word;
-            }
-
-            .stat-label {
-                font-size: 0.8em;
-            }
-        }
-
-        /* Transactions Modal */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
+        /* Tables */
+        .data-table {
             width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            z-index: 1000;
-            overflow-y: auto;
-            padding: 20px;
+            border-collapse: collapse;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            overflow: hidden;
+            font-size: 0.85em;
         }
 
-        .modal-content {
-            position: relative;
-            max-width: 900px;
-            margin: 40px auto;
-            background: rgba(0, 0, 0, 0.95);
-            border: 2px solid #00f2fe;
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 0 40px rgba(0, 242, 254, 0.5);
+        .data-table thead {
+            background: rgba(0, 242, 254, 0.2);
         }
 
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid rgba(0, 242, 254, 0.3);
-        }
-
-        .modal-header h2 {
+        .data-table th {
+            padding: 12px 8px;
+            text-align: left;
             color: #00f2fe;
-            margin: 0;
-            font-size: 1.8em;
-            text-shadow: 0 0 10px #00f2fe;
+            font-weight: 600;
+            border-bottom: 2px solid #00f2fe;
         }
 
-        .modal-close {
-            background: rgba(255, 0, 102, 0.2);
-            border: 2px solid #ff0066;
-            color: #ff0066;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 1.5em;
-            font-weight: bold;
-            transition: all 0.3s ease;
+        .data-table td {
+            padding: 10px 8px;
+            color: #fff;
+            border-bottom: 1px solid rgba(0, 242, 254, 0.1);
         }
 
-        .modal-close:hover {
-            background: #ff0066;
-            color: #000;
-            box-shadow: 0 0 20px rgba(255, 0, 102, 0.6);
-            transform: rotate(90deg);
+        .data-table tr:last-child td {
+            border-bottom: none;
         }
 
-        .transaction-summary {
+        /* Summary Cards */
+        .summary-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 15px;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
 
         .summary-card {
             background: linear-gradient(135deg, rgba(0, 242, 254, 0.1), rgba(255, 0, 102, 0.1));
             border: 2px solid #00f2fe;
-            padding: 20px;
+            padding: 15px;
             border-radius: 15px;
             text-align: center;
             box-shadow: 0 0 20px rgba(0, 242, 254, 0.3);
@@ -733,7 +506,7 @@
         }
 
         .summary-amount {
-            font-size: 2em;
+            font-size: 1.8em;
             font-weight: 900;
             color: #00f2fe;
             text-shadow: 0 0 15px #00f2fe;
@@ -752,964 +525,679 @@
 
         .summary-card h4 {
             color: rgba(255, 255, 255, 0.8);
-            font-size: 0.9em;
+            font-size: 0.85em;
             font-weight: 600;
             margin: 0;
         }
 
         .summary-description {
-            font-size: 0.75em;
+            font-size: 0.7em;
             color: rgba(255, 255, 255, 0.6);
             margin-top: 5px;
         }
 
-        .expenses-section {
-            margin-top: 30px;
-        }
-
-        .expenses-section h3 {
-            color: #00f2fe;
-            margin-bottom: 15px;
-            text-shadow: 0 0 8px #00f2fe;
-        }
-
-        .expenses-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: rgba(0, 0, 0, 0.4);
+        .error-message,
+        .success-message {
+            padding: 15px;
             border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .expenses-table thead {
-            background: rgba(0, 242, 254, 0.2);
-        }
-
-        .expenses-table th {
-            padding: 12px;
-            text-align: left;
-            color: #00f2fe;
-            font-weight: 600;
-            border-bottom: 2px solid #00f2fe;
-        }
-
-        .expenses-table td {
-            padding: 10px 12px;
-            color: #fff;
-            border-bottom: 1px solid rgba(0, 242, 254, 0.1);
-        }
-
-        .expenses-table tbody tr:nth-child(even) {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .expenses-table tbody tr:hover {
-            background: rgba(0, 242, 254, 0.1);
-        }
-
-        .category-badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 0.85em;
-            font-weight: 600;
-            background: rgba(0, 242, 254, 0.2);
-            border: 1px solid #00f2fe;
-            color: #00f2fe;
-        }
-
-        .no-expenses {
             text-align: center;
-            padding: 40px;
-            color: rgba(255, 255, 255, 0.6);
-            font-style: italic;
+            font-weight: 600;
+            margin-top: 15px;
         }
 
+        .error-message {
+            background: rgba(255, 0, 102, 0.2);
+            border: 2px solid #ff0066;
+            color: #ff0066;
+        }
+
+        .success-message {
+            background: rgba(56, 239, 125, 0.2);
+            border: 2px solid #38ef7d;
+            color: #38ef7d;
+        }
+
+        /* Mobile Responsive */
         @media (max-width: 768px) {
-            .modal-content {
-                padding: 20px;
-                margin: 20px auto;
+            .container {
+                max-width: 100%;
+                padding: 15px;
             }
 
-            .transaction-summary {
+            .admin-panel {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .tab-btn {
+                min-width: 100px;
+                font-size: 0.75em;
+                padding: 10px 8px;
+            }
+
+            .user-info {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            .input-group input {
+                min-width: 100%;
+            }
+
+            .data-table {
+                font-size: 0.75em;
+            }
+
+            .data-table th,
+            .data-table td {
+                padding: 8px 5px;
+            }
+
+            .summary-grid {
                 grid-template-columns: 1fr;
             }
 
-            .expenses-table {
-                font-size: 0.85em;
+            .section {
+                padding: 15px;
             }
+        }
 
-            .expenses-table th,
-            .expenses-table td {
-                padding: 8px 6px;
-            }
-
-            .modal-header h2 {
-                font-size: 1.4em;
+        @media (min-width: 1200px) {
+            .container {
+                max-width: 1100px;
             }
         }
     </style>
 </head>
 
 <body>
+    <!-- Animated Background -->
     <div class="bg-wrapper">
-        <img src="images/bg.jpg" alt="Background" class="bg-image">
+        <img src="images/background.jpg" alt="Background" class="bg-image">
         <div class="bg-overlay"></div>
     </div>
 
     <div class="container">
         <!-- Login Card -->
-        <div class="login-card" id="loginCard">
+        <div id="loginCard" class="login-card">
             <div class="header">
-                <h1>🔐 ADMIN PANEL</h1>
+                <h1>🔐 Admin Panel</h1>
                 <p>Sign in with your authorized Google account</p>
             </div>
-
-            <div id="g_id_onload"
-                data-client_id="1011495957114-jftfnap62g44g6a6l50psgc615tatckr.apps.googleusercontent.com"
-                data-callback="handleCredentialResponse" data-auto_prompt="false">
-            </div>
-
-            <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline"
-                data-text="sign_in_with" data-shape="rectangular" data-logo_alignment="left">
-            </div>
-
-            <div class="loading-verification" id="loadingVerification">
-                <div class="spinner"></div>
-                <p>Verifying authorization...</p>
-            </div>
-
-            <div class="access-denied" id="accessDenied">
-                <h3>❌ Access Denied</h3>
-                <p>Your email is not authorized. Please contact the administrator.</p>
-            </div>
-
-            <div class="links">
-                <a href="index.html">← Back to Event</a>
-                <a href="stats.html">📊 Statistics</a>
-            </div>
+            <div id="g_id_onload" data-client_id="" data-callback="handleCredentialResponse"></div>
+            <div class="g_id_signin" data-type="standard" data-theme="filled_black" data-size="large"
+                data-logo_alignment="left"></div>
         </div>
 
         <!-- Admin Panel -->
-        <div class="admin-panel" id="adminPanel">
-            <div class="header">
-                <h1>🎫 TICKET VERIFICATION</h1>
-                <p>Scan or enter UTR to verify tickets</p>
-            </div>
-
+        <div id="adminPanel" class="admin-panel">
+            <!-- User Info -->
             <div class="user-info">
-                <div>
-                    <span>Logged in as: </span>
-                    <span class="user-email" id="userEmail"></span>
-                </div>
+                <span class="user-email" id="userEmail"></span>
                 <button class="logout-btn" onclick="logout()">Logout</button>
             </div>
 
-            <!-- Notification Bar for Scanned Ticket -->
-            <div class="notification-bar" id="notificationBar">
-                <h3>🎫 Ticket Scanned</h3>
-                <div class="ticket-preview" id="ticketPreview">
-                    <!-- Ticket details will be populated here -->
-                </div>
-                <div class="notification-actions">
-                    <button class="confirm-verify-btn" onclick="confirmVerification()">✅ Verify Ticket</button>
-                    <button class="cancel-btn" onclick="cancelVerification()">❌ Cancel</button>
+            <!-- Tab Navigation -->
+            <div class="tab-navigation">
+                <button class="tab-btn active" onclick="switchTab('qr-scanner')">📸 QR Scanner</button>
+                <button class="tab-btn" onclick="switchTab('manual-verify')">✍️ Manual Verify</button>
+                <button class="tab-btn" onclick="switchTab('check-status')">🔍 Check Status</button>
+                <button class="tab-btn" onclick="switchTab('pending')">⏳ Pending</button>
+                <button class="tab-btn" onclick="switchTab('transactions')">💰 Transactions</button>
+            </div>
+
+            <!-- Tab 1: QR Scanner -->
+            <div id="qr-scanner" class="tab-content active">
+                <div class="section">
+                    <h3>📸 QR Code Scanner</h3>
+                    <button id="startScanBtn" class="btn" onclick="startScanner()">Start Camera</button>
+                    <button id="stopScanBtn" class="btn" onclick="stopScanner()" style="display:none;">Stop
+                        Scanner</button>
+                    <div id="qr-reader" style="display:none;"></div>
+                    <div id="scannedResult"></div>
                 </div>
             </div>
 
-            <div class="scanner-container">
-                <h3>📷 QR Code Scanner</h3>
-                <button class="scan-btn" id="scanBtn" onclick="toggleScanner()">📸 Scan QR Code</button>
-                <div id="reader"></div>
-                <div id="scanInstructions"
-                    style="display: none; margin-top: 15px; padding: 15px; background: rgba(0, 242, 254, 0.1); border: 1px solid #00f2fe; border-radius: 10px; text-align: center;">
-                    <p style="color: #00f2fe; margin: 0; font-size: 0.9em;">
-                        💡 <strong>Scanning Tips:</strong><br>
-                        • Hold QR code 15-20cm from camera<br>
-                        • Ensure good lighting<br>
-                        • Keep QR code steady and flat<br>
-                        • Wait 3-5 seconds for detection
+            <!-- Tab 2: Manual Verify -->
+            <div id="manual-verify" class="tab-content">
+                <div class="section">
+                    <h3>✍️ Manual Ticket Verification</h3>
+                    <div class="input-group">
+                        <input type="text" id="manualPhone" placeholder="Enter Phone Number" />
+                        <button class="btn" onclick="searchTicket()">Search</button>
+                    </div>
+                    <div id="manualResult"></div>
+                </div>
+            </div>
+
+            <!-- Tab 3: Check Status (NEW) -->
+            <div id="check-status" class="tab-content">
+                <div class="section">
+                    <h3>🔍 Check Ticket Status</h3>
+                    <p style="color: rgba(255,255,255,0.7); font-size: 0.85em; margin-bottom: 15px;">
+                        View detailed ticket information including payment status
                     </p>
+                    <div class="input-group">
+                        <input type="text" id="statusPhone" placeholder="Enter Phone Number" />
+                        <button class="btn" onclick="checkTicketStatus()">Search</button>
+                    </div>
+                    <div id="statusResult"></div>
                 </div>
             </div>
 
-            <div class="manual-input">
-                <h3>✍️ Or Enter UTR Manually</h3>
-                <div class="input-group">
-                    <input type="text" id="manualUTR" placeholder="Enter 12-digit UTR">
-                    <button class="verify-btn" onclick="verifyManualUTR()">Verify</button>
+            <!-- Tab 4: Pending Students -->
+            <div id="pending" class="tab-content">
+                <div class="section">
+                    <h3>⏳ Pending Students</h3>
+                    <button class="btn" onclick="loadPendingStudents()">Load Pending Students</button>
+                    <div id="pendingLoader" style="display:none;">
+                        <div class="spinner"></div>
+                        <p style="text-align:center; color:#00f2fe;">⚙️ Fetching data...</p>
+                    </div>
+                    <div id="pendingList"></div>
                 </div>
             </div>
 
-            <div class="loader" id="loader"></div>
-            <div id="resultCard" class="result-card"></div>
-
-            <!-- Statistics -->
-            <div class="stats-section" style="margin-bottom: 20px;">
-                <h3 style="font-size: 1.3em; margin-bottom: 15px;">📊 Live Statistics</h3>
-                <div class="stats-grid" style="grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 15px;">
-                    <div class="stat-card" style="padding: 15px;">
-                        <div class="stat-number" id="totalVerified" style="font-size: 1.8em;">0</div>
-                        <div class="stat-label" style="font-size: 0.9em;">Verified</div>
+            <!-- Tab 5: Transactions -->
+            <div id="transactions" class="tab-content">
+                <div class="section">
+                    <h3>💰 Financial Transactions</h3>
+                    <button class="btn" onclick="loadTransactions()">Load Transactions</button>
+                    <div id="transactionLoader" style="display:none;">
+                        <div class="spinner"></div>
+                        <p style="text-align:center; color:#00f2fe;">⚙️ Loading...</p>
                     </div>
-                    <div class="stat-card" style="padding: 15px;">
-                        <div class="stat-number" id="totalPending" style="font-size: 1.8em;">0</div>
-                        <div class="stat-label" style="font-size: 0.9em;">Pending</div>
-                    </div>
-                </div>
-
-                <!-- View Transactions Button -->
-                <button class="download-btn" onclick="openTransactionsModal()"
-                    style="margin-bottom: 15px; background: linear-gradient(135deg, #00f2fe, #ff0066);">
-                    💰 View Transactions
-                </button>
-            </div>
-
-            <!-- Pending and Download Buttons -->
-            <button class="download-btn" style="margin-bottom: 15px;" onclick="loadPendingStudents()">
-                � View Pending Students
-            </button>
-            <button class="download-btn" onclick="downloadVerifiedList()">
-                � Download All Verified Students
-            </button>
-            <div id="pendingList" style="display: none;"></div>
-
-            <div class="links">
-                <a href="index.html">← Back to Event</a>
-                <a href="stats.html">📊 Statistics</a>
-            </div>
-        </div>
-
-        <!-- Transactions Modal -->
-        <div class="modal-overlay" id="transactionsModal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2>💰 Financial Transactions</h2>
-                    <button class="modal-close" onclick="closeTransactionsModal()">×</button>
-                </div>
-
-                <!-- Transaction Summary -->
-                <div class="transaction-summary">
-                    <div class="summary-card positive">
-                        <h4>Total Collected</h4>
-                        <div class="summary-amount" id="modalTotalCollected">₹0</div>
-                        <div class="summary-description" id="modalVerifiedCount">0 verified students × ₹85</div>
-                    </div>
-
-                    <div class="summary-card negative">
-                        <h4>Total Spent</h4>
-                        <div class="summary-amount" id="modalTotalSpent">₹0</div>
-                        <div class="summary-description" id="modalExpenseCount">0 expenses</div>
-                    </div>
-
-                    <div class="summary-card">
-                        <h4>Remaining Balance</h4>
-                        <div class="summary-amount" id="modalRemaining">₹0</div>
-                        <div class="summary-description">Available funds</div>
-                    </div>
-                </div>
-
-                <!-- Loading Screen -->
-                <div class="loading-verification" id="transactionLoading" style="display: none; margin: 40px 0;">
-                    <div class="spinner"></div>
-                    <p style="color: #00f2fe; font-size: 1.1em;">Loading financial data...</p>
-                </div>
-
-                <!-- Expenses List -->
-                <div class="expenses-section" id="expensesSection" style="display: none;">
-                    <h3>📝 Expense Breakdown</h3>
-                    <div id="expensesTableContainer">
-                        <!-- Table will be populated by JavaScript -->
-                    </div>
+                    <div id="transactionData"></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Configuration -->
-    <script src="config.js?v=2.0"></script>
-
     <script>
-        const API_URL = CONFIG.apiUrl;
-
+        let authToken = '';
+        let userEmail = '';
         let html5QrCode = null;
-        let currentUserEmail = '';
-        let currentUserToken = ''; // Store JWT token for backend authentication
-        let isScanning = false;
-        let scannedUTR = null;
 
-        // Google Sign-In callback
-        async function handleCredentialResponse(response) {
-            // Store the JWT token
-            currentUserToken = response.credential;
+        // Set Google Client ID
+        window.onload = function () {
+            document.querySelector('[data-client_id]').setAttribute('data-client_id', CONFIG.googleClientId);
+        };
 
-            const responsePayload = parseJwt(response.credential);
-            const email = responsePayload.email;
-            currentUserEmail = email;
+        // Handle Google Sign-In
+        function handleCredentialResponse(response) {
+            authToken = response.credential;
 
-            // Show loading spinner
-            document.getElementById('loadingVerification').style.display = 'block';
+            // Decode JWT to get email
+            const payload = JSON.parse(atob(authToken.split('.')[1]));
+            userEmail = payload.email;
 
-            // IMMEDIATE VALIDATION: Check with backend if this email is authorized
+            // Verify with backend
+            verifyAdmin(authToken);
+        }
+
+        async function verifyAdmin(token) {
             try {
-                // Make a test API call to verify authorization - use PROTECTED endpoint
-                const testResponse = await fetch(`${API_URL}?action=getVerifiedList&token=${encodeURIComponent(currentUserToken)}`);
-                const testData = await testResponse.json();
+                const response = await fetch(`${CONFIG.apiUrl}?action=verifyAdmin&token=${token}`);
+                const data = await response.json();
 
-                // Hide loading spinner
-                document.getElementById('loadingVerification').style.display = 'none';
-
-                // If response status is 403 or error indicates unauthorized
-                if (testResponse.status === 403 || (!testData.success && testData.error && testData.error.toLowerCase().includes('unauthorized'))) {
-                    // User is NOT authorized
-                    document.getElementById('accessDenied').style.display = 'block';
-                    currentUserEmail = '';
-                    currentUserToken = '';
-                    return;
+                if (data.authorized) {
+                    document.getElementById('loginCard').style.display = 'none';
+                    document.getElementById('adminPanel').style.display = 'block';
+                    document.getElementById('userEmail').textContent = data.email;
+                } else {
+                    alert('❌ Unauthorized! You are not an admin.');
+                    logout();
                 }
-
-                // User is authorized - show admin panel
-                showAdminPanel();
-
             } catch (error) {
-                console.error('Authorization check failed:', error);
-                document.getElementById('loadingVerification').style.display = 'none';
-                document.getElementById('accessDenied').style.display = 'block';
-                currentUserEmail = '';
-                currentUserToken = '';
+                alert('Error verifying admin: ' + error.message);
             }
-        }
-
-        function parseJwt(token) {
-            const base64Url = token.split('.')[1];
-            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-            const jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
-                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-            }).join(''));
-            return JSON.parse(jsonPayload);
-        }
-
-        function showAdminPanel() {
-            document.getElementById('loginCard').style.display = 'none';
-            document.getElementById('adminPanel').style.display = 'block';
-            document.getElementById('userEmail').textContent = currentUserEmail;
-
-            // Load statistics
-            loadStats();
         }
 
         function logout() {
-            currentUserEmail = '';
-            currentUserToken = '';
+            authToken = '';
+            userEmail = '';
             document.getElementById('loginCard').style.display = 'block';
             document.getElementById('adminPanel').style.display = 'none';
-            document.getElementById('accessDenied').style.display = 'none';
-            document.getElementById('loadingVerification').style.display = 'none';
-
-            if (html5QrCode && isScanning) {
-                stopScanner();
-            }
+            google.accounts.id.disableAutoSelect();
         }
 
-        async function toggleScanner() {
-            if (isScanning) {
-                stopScanner();
-            } else {
-                startScanner();
-            }
+        // Tab Switching
+        function switchTab(tabId) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Deactivate all buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
         }
 
-        async function startScanner() {
-            const scanBtn = document.getElementById('scanBtn');
-            const readerDiv = document.getElementById('reader');
+        // QR Scanner Functions
+        function startScanner() {
+            const qrReaderDiv = document.getElementById('qr-reader');
+            const startBtn = document.getElementById('startScanBtn');
+            const stopBtn = document.getElementById('stopScanBtn');
 
-            try {
-                scanBtn.disabled = true;
-                readerDiv.style.display = 'block';
+            qrReaderDiv.style.display = 'block';
+            startBtn.style.display = 'none';
+            stopBtn.style.display = 'inline-block';
 
-                if (!html5QrCode) {
-                    html5QrCode = new Html5Qrcode("reader");
-                }
+            html5QrCode = new Html5Qrcode("qr-reader");
 
-                // Maximum speed configuration - Optimized for fast scanning
-                const config = {
-                    fps: 15, // Higher FPS for faster detection (scans every 67ms)
-                    qrbox: function (viewfinderWidth, viewfinderHeight) {
-                        // 60% scan box - Good balance of speed and ease of use
-                        let minEdgeSize = Math.min(viewfinderWidth, viewfinderHeight);
-                        let qrboxSize = Math.floor(minEdgeSize * 0.6);
-                        return {
-                            width: qrboxSize,
-                            height: qrboxSize
-                        };
-                    },
-                    aspectRatio: 1.0,
-                    disableFlip: false,
-                    videoConstraints: {
-                        facingMode: { ideal: "environment" },
-                        aspectRatio: 1.0,
-                        advanced: [{
-                            focusMode: "continuous",
-                            zoom: 1.0
-                        }],
-                        width: { ideal: 1280 },
-                        height: { ideal: 720 }
-                    },
-                    experimentalFeatures: {
-                        useBarCodeDetectorIfSupported: false
-                    },
-                    showTorchButtonIfSupported: true,
-                    formatsToSupport: [
-                        Html5QrcodeSupportedFormats.QR_CODE
-                    ],
-                    defaultZoomValueIfSupported: 2,
-                    supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA]
-                };
-
-                // Try multiple camera selection methods for better compatibility
-                let cameraStarted = false;
-
-                // Method 1: Try with environment facing mode (Standard approach)
-                try {
-                    await html5QrCode.start(
-                        { facingMode: "environment" },
-                        config,
-                        (decodedText, decodedResult) => {
-                            console.log("QR Code detected:", decodedText);
-                            scannedUTR = decodedText;
-                            stopScanner();
-                            showNotification(decodedText);
-                        },
-                        (errorMessage) => {
-                            // Scanning error (ignore - fires continuously)
-                        }
-                    );
-                    cameraStarted = true;
-                } catch (error1) {
-                    console.log("Method 1 failed, trying alternative...", error1);
-
-                    // Method 2: Get available cameras and select rear camera explicitly
-                    try {
-                        const cameras = await Html5Qrcode.getCameras();
-                        console.log("Available cameras:", cameras);
-
-                        if (cameras && cameras.length > 0) {
-                            // Find rear camera (usually has 'back' or 'rear' in label or is the first camera)
-                            let rearCamera = cameras.find(cam =>
-                                cam.label.toLowerCase().includes('back') ||
-                                cam.label.toLowerCase().includes('rear') ||
-                                cam.label.toLowerCase().includes('environment')
-                            );
-
-                            // If no rear camera found, use the last camera (often rear on many devices)
-                            if (!rearCamera && cameras.length >= 2) {
-                                rearCamera = cameras[cameras.length - 1];
-                            } else if (!rearCamera) {
-                                rearCamera = cameras[0];
-                            }
-
-                            console.log("Selected camera:", rearCamera);
-
-                            await html5QrCode.start(
-                                rearCamera.id,
-                                config,
-                                (decodedText, decodedResult) => {
-                                    console.log("QR Code detected:", decodedText);
-                                    scannedUTR = decodedText;
-                                    stopScanner();
-                                    showNotification(decodedText);
-                                },
-                                (errorMessage) => {
-                                    // Scanning error (ignore - fires continuously)
-                                }
-                            );
-                            cameraStarted = true;
-                        }
-                    } catch (error2) {
-                        console.error("Method 2 also failed:", error2);
-                        throw new Error("Unable to start camera. Please ensure camera permissions are granted.");
-                    }
-                }
-
-                if (cameraStarted) {
-                    isScanning = true;
-                    scanBtn.textContent = '⏹️ Stop Scanning';
-                    scanBtn.classList.add('scanning');
-                    scanBtn.disabled = false;
-                    // Show scanning instructions
-                    document.getElementById('scanInstructions').style.display = 'block';
-                    console.log('Scanner started successfully. Hold QR code 15-20cm from camera.');
-                }
-
-            } catch (err) {
-                console.error("Camera access failed:", err);
-
-                // More helpful error messages
-                let errorMsg = "Camera access failed. ";
-                if (err.name === 'NotAllowedError' || err.message.includes('Permission')) {
-                    errorMsg += "Please allow camera permissions in your browser settings and try again.";
-                } else if (err.message.includes('not supported')) {
-                    errorMsg += "Your browser may not support camera access. Try using Chrome or Firefox.";
-                } else {
-                    errorMsg += "Please use manual entry instead.";
-                }
-
-                alert(errorMsg);
-                readerDiv.style.display = 'none';
-                scanBtn.disabled = false;
-                scanBtn.textContent = '📸 Scan QR Code';
-            }
+            html5QrCode.start(
+                { facingMode: "environment" },
+                { fps: 10, qrbox: { width: 250, height: 250 } },
+                onScanSuccess,
+                onScanError
+            ).catch(err => {
+                alert('Error starting camera: ' + err);
+                stopScanner();
+            });
         }
 
         function stopScanner() {
-            const scanBtn = document.getElementById('scanBtn');
-            const readerDiv = document.getElementById('reader');
-
-            if (html5QrCode && isScanning) {
+            if (html5QrCode) {
                 html5QrCode.stop().then(() => {
-                    isScanning = false;
-                    readerDiv.style.display = 'none';
-                    scanBtn.textContent = '📸 Scan QR Code';
-                    scanBtn.classList.remove('scanning');
-                    scanBtn.disabled = false;
-                    // Hide scanning instructions
-                    document.getElementById('scanInstructions').style.display = 'none';
-                }).catch(err => {
-                    console.error('Error stopping scanner:', err);
+                    document.getElementById('qr-reader').style.display = 'none';
+                    document.getElementById('startScanBtn').style.display = 'inline-block';
+                    document.getElementById('stopScanBtn').style.display = 'none';
+                    html5QrCode = null;
                 });
             }
         }
 
-        function showNotification(utr) {
-            const notificationBar = document.getElementById('notificationBar');
-            const ticketPreview = document.getElementById('ticketPreview');
-
-            ticketPreview.innerHTML = `
-                <div class="preview-row">
-                    <span class="preview-label">UTR Number:</span>
-                    <span class="preview-value">${utr}</span>
-                </div>
-                <div class="preview-row">
-                    <span class="preview-label">Status:</span>
-                    <span class="preview-value">Ready to Verify</span>
-                </div>
-            `;
-
-            notificationBar.style.display = 'block';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        function onScanSuccess(decodedText, decodedResult) {
+            stopScanner();
+            showTicketPreview(decodedText);
         }
 
-        function cancelVerification() {
-            scannedUTR = null;
-            document.getElementById('notificationBar').style.display = 'none';
+        function onScanError(error) {
+            // Ignore errors during scanning
         }
 
-        async function confirmVerification() {
-            if (scannedUTR) {
-                document.getElementById('notificationBar').style.display = 'none';
-                await verifyUTR(scannedUTR, true);
-                scannedUTR = null;
-            }
-        }
-
-        async function verifyManualUTR() {
-            const utr = document.getElementById('manualUTR').value.trim();
-            if (!utr) {
-                showResult('Please enter a UTR number', 'error');
-                return;
-            }
-            await verifyUTR(utr, false);
-        }
-
-        async function verifyUTR(utr, fromScanner) {
-            const loader = document.getElementById('loader');
-            const resultCard = document.getElementById('resultCard');
-
-            loader.style.display = 'block';
-            resultCard.style.display = 'none';
-
+        async function showTicketPreview(ticketID) {
             try {
-                const response = await fetch(`${API_URL}?action=verifyTicket&utr=${encodeURIComponent(utr)}&token=${encodeURIComponent(currentUserToken)}`, {
-                    method: 'POST'
-                });
-
+                const response = await fetch(`${CONFIG.apiUrl}?action=getTicketByPhone&phone=${ticketID}`);
                 const data = await response.json();
 
-                // Handle unauthorized access
-                if (!data.success && response.status === 403) {
-                    showResult(`
-                        <h3>🔒 UNAUTHORIZED</h3>
-                        <p>Your account is not authorized to access the admin panel.</p>
-                        <p style="margin-top: 10px; font-size: 0.9em;">Please contact the administrator for access.</p>
-                    `, 'error');
-                    playSound('error');
-                    // Log out the user after 3 seconds
-                    setTimeout(() => {
-                        logout();
-                    }, 3000);
-                    return;
-                }
-
-                if (data.success && data.status === 'VERIFIED') {
-                    let detailsHTML = `
-                        <h3>✅ VERIFIED</h3>
-                        <div class="result-details">
-                            <div class="detail-row">
-                                <span>Ticket ID:</span>
-                                <strong>${data.ticketID}</strong>
+                if (data.success && data.ticket) {
+                    const t = data.ticket;
+                    document.getElementById('scannedResult').innerHTML = `
+                        <div class="notification-bar">
+                            <h3>🎫 Scanned Ticket</h3>
+                            <div class="ticket-preview">
+                                <div class="preview-row">
+                                    <span class="preview-label">Name:</span>
+                                    <span class="preview-value">${t.name}</span>
+                                </div>
+                                <div class="preview-row">
+                                    <span class="preview-label">Phone:</span>
+                                    <span class="preview-value">${t.phone}</span>
+                                </div>
+                                <div class="preview-row">
+                                    <span class="preview-label">Tickets:</span>
+                                    <span class="preview-value">${t.numberOfTickets || 1}</span>
+                                </div>
+                                <div class="preview-row">
+                                    <span class="preview-label">Status:</span>
+                                    <span class="preview-value">${t.status}</span>
+                                </div>
                             </div>
-                            <div class="detail-row">
-                                <span>Name:</span>
-                                <strong>${data.name}</strong>
-                            </div>
-                            <div class="detail-row">
-                                <span>Roll Number:</span>
-                                <strong>${data.rollNumber}</strong>
-                            </div>
-                            <div class="detail-row">
-                                <span>Phone:</span>
-                                <strong>${data.phone}</strong>
-                            </div>
-                            <div class="detail-row">
-                                <span>Number of Tickets:</span>
-                                <strong style="color: #00f2fe;">${data.numberOfTickets || 1}</strong>
-                            </div>
-                            <div class="detail-row">
-                                <span>Amount Paid:</span>
-                                <strong>₹${data.actualAmount}</strong>
-                            </div>
-                    `;
-
-                    if (data.overpayment && data.overpayment > 0) {
-                        detailsHTML += `
-                            <div class="detail-row">
-                                <span>Overpayment:</span>
-                                <strong style="color: #38ef7d;">+₹${data.overpayment}</strong>
-                            </div>
-                        `;
-                    }
-
-                    detailsHTML += '</div>';
-                    showResult(detailsHTML, 'verified');
-
-                    // Play success sound
-                    playSound('success');
-
-                    // Reload stats
-                    loadStats();
-                } else if (data.status === 'ALREADY_USED') {
-                    showResult(`
-                        <h3>❌ ALREADY USED</h3>
-                        <p>${data.message}</p>
-                        <p style="margin-top: 10px;">Ticket ID: <strong>${data.ticketID}</strong></p>
-                    `, 'error');
-                    playSound('error');
-                } else if (data.status === 'PAYMENT_NOT_FOUND' || data.status === 'NOT_FOUND') {
-                    showResult(`
-                        <h3>⚠️ PAYMENT NOT FOUND</h3>
-                        <p>${data.message}</p>
-                    `, 'warning');
-                    playSound('error');
-                } else if (data.status === 'INSUFFICIENT_AMOUNT' || data.status === 'INVALID_AMOUNT') {
-                    let amountDetailsHTML = `
-                        <h3>❌ INSUFFICIENT PAYMENT</h3>
-                        <p>${data.message}</p>
-                        <div class="result-details" style="margin-top: 15px;">
-                            <div class="detail-row">
-                                <span>Tickets:</span>
-                                <strong>${data.numberOfTickets || 1}</strong>
-                            </div>
-                            <div class="detail-row">
-                                <span>Required Amount:</span>
-                                <strong>₹${data.requiredAmount}</strong>
-                            </div>
-                            <div class="detail-row">
-                                <span>Paid Amount:</span>
-                                <strong style="color: #ff0066;">₹${data.actualAmount}</strong>
-                            </div>
-                            <div class="detail-row">
-                                <span>Shortfall:</span>
-                                <strong style="color: #ff0066;">₹${data.requiredAmount - data.actualAmount}</strong>
+                            <div class="notification-actions">
+                                ${t.status === 'PENDING' ? `
+                                    <button class="confirm-verify-btn" onclick="verifyScannedTicket('${t.utr}')">✅ Verify</button>
+                                ` : `
+                                    <div style="text-align:center; width:100%; color:#38ef7d;">✅ Already Verified</div>
+                                `}
+                                <button class="cancel-btn" onclick="document.getElementById('scannedResult').innerHTML=''">Close</button>
                             </div>
                         </div>
                     `;
-                    showResult(amountDetailsHTML, 'error');
-                    playSound('error');
-                } else if (data.status === 'PAYMENT_FAILED') {
-                    showResult(`
-                        <h3>❌ PAYMENT FAILED</h3>
-                        <p>${data.message}</p>
-                        <p style="margin-top: 10px;">Status: <strong>${data.paymentStatus}</strong></p>
-                    `, 'error');
-                    playSound('error');
-                } else if (data.status === 'NOT_REGISTERED') {
-                    showResult(`
-                        <h3>⚠️ NOT REGISTERED</h3>
-                        <p>${data.message}</p>
-                    `, 'warning');
-                    playSound('error');
                 } else {
-                    showResult(`
-                        <h3>❌ ERROR</h3>
-                        <p>${data.message || 'Verification failed'}</p>
-                    `, 'error');
-                    playSound('error');
+                    document.getElementById('scannedResult').innerHTML = `
+                        <div class="error-message">❌ No ticket found</div>
+                    `;
                 }
             } catch (error) {
-                showResult(`
-                    <h3>❌ ERROR</h3>
-                    <p>${error.message}</p>
-                `, 'error');
-                playSound('error');
-            } finally {
+                document.getElementById('scannedResult').innerHTML = `
+                    <div class="error-message">Error: ${error.message}</div>
+                `;
+            }
+        }
+
+        async function verifyScannedTicket(utr) {
+            try {
+                const response = await fetch(`${CONFIG.apiUrl}?action=verifyTicket&utr=${utr}&token=${authToken}`, {
+                    method: 'GET'
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('scannedResult').innerHTML = `
+                        <div class="success-message">✅ ${data.message}</div>
+                    `;
+                } else {
+                    document.getElementById('scannedResult').innerHTML = `
+                        <div class="error-message">❌ ${data.message}</div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('scannedResult').innerHTML = `
+                    <div class="error-message">Error: ${error.message}</div>
+                `;
+            }
+        }
+
+        // Manual Verification
+        async function searchTicket() {
+            const phone = document.getElementById('manualPhone').value.trim();
+            if (!phone) return alert('Enter phone number');
+
+            try {
+                const response = await fetch(`${CONFIG.apiUrl}?action=getTicketByPhone&phone=${phone}`);
+                const data = await response.json();
+
+                if (data.success && data.ticket) {
+                    const t = data.ticket;
+                    document.getElementById('manualResult').innerHTML = `
+                        <div class="notification-bar">
+                            <h3>🎫 Ticket Found</h3>
+                            <div class="ticket-preview">
+                                <div class="preview-row">
+                                    <span class="preview-label">Name:</span>
+                                    <span class="preview-value">${t.name}</span>
+                                </div>
+                                <div class="preview-row">
+                                    <span class="preview-label">Roll:</span>
+                                    <span class="preview-value">${t.rollNumber}</span>
+                                </div>
+                                <div class="preview-row">
+                                    <span class="preview-label">Phone:</span>
+                                    <span class="preview-value">${t.phone}</span>
+                                </div>
+                                <div class="preview-row">
+                                    <span class="preview-label">Tickets:</span>
+                                    <span class="preview-value">${t.numberOfTickets || 1}</span>
+                                </div>
+                                <div class="preview-row">
+                                    <span class="preview-label">UTR:</span>
+                                    <span class="preview-value">${t.utr}</span>
+                                </div>
+                                <div class="preview-row">
+                                    <span class="preview-label">Status:</span>
+                                    <span class="preview-value">${t.status}</span>
+                                </div>
+                            </div>
+                            <div class="notification-actions">
+                                ${t.status === 'PENDING' ? `
+                                    <button class="confirm-verify-btn" onclick="verifyScannedTicket('${t.utr}')">✅ Verify</button>
+                                ` : `
+                                    <div style="text-align:center; width:100%; color:#38ef7d;">✅ Already Verified</div>
+                                `}
+                                <button class="cancel-btn" onclick="document.getElementById('manualResult').innerHTML=''">Close</button>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    document.getElementById('manualResult').innerHTML = `
+                        <div class="error-message">❌ No ticket found for this phone number</div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('manualResult').innerHTML = `
+                    <div class="error-message">Error: ${error.message}</div>
+                `;
+            }
+        }
+
+        // Check Ticket Status (NEW)
+        async function checkTicketStatus() {
+            const phone = document.getElementById('statusPhone').value.trim();
+            if (!phone) return alert Enter phone number');
+
+            try {
+                const response = await fetch(`${CONFIG.apiUrl}?action=getTicketByPhone&phone=${phone}`);
+                const data = await response.json();
+
+                if (data.success && data.ticket) {
+                    const t = data.ticket;
+
+                    // Get current config for price
+                    const configResponse = await fetch(`${CONFIG.apiUrl}?action=getConfig`);
+                    const configData = await configResponse.json();
+                    const ticketPrice = configData.config?.ticketPrice || 60;
+
+                    // Calculate payment difference
+                    const requiredAmount = (t.numberOfTickets || 1) * ticketPrice;
+                    const paidAmount = t.totalAmount || requiredAmount;
+                    const difference = paidAmount - requiredAmount;
+
+                    document.getElementById('statusResult').innerHTML = `
+                        <div class="status-card ${t.status === 'VERIFIED' ? 'verified' : 'pending'}">
+                            <h3>🎫 Ticket Details</h3>
+                            <div class="detail-row">
+                                <span>Ticket ID:</span>
+                                <span>${t.ticketID || 'Not Generated Yet'}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>Name:</span>
+                                <span>${t.name}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>Roll Number:</span>
+                                <span>${t.rollNumber}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>Batch:</span>
+                                <span>${t.year}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>Phone:</span>
+                                <span>${t.phone}</span>
+                            </div>
+
+                            <h4 style="margin-top: 20px;">💰 Payment Information</h4>
+                            <div class="detail-row">
+                                <span>Number of Tickets:</span>
+                                <span>${t.numberOfTickets || 1}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>Required Amount:</span>
+                                <span>₹${requiredAmount}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>Paid Amount:</span>
+                                <span>₹${paidAmount}</span>
+                            </div>
+                            ${difference > 0 ? `
+                                <div class="detail-row overpaid">
+                                    <span>⚠️ Overpaid:</span>
+                                    <span>₹${difference} (May be refundable)</span>
+                                </div>
+                            ` : difference < 0 ? `
+                                <div class="detail-row underpaid">
+                                    <span>❌ Underpaid:</span>
+                                    <span>₹${Math.abs(difference)}</span>
+                                </div>
+                            ` : `
+                                <div class="detail-row exact">
+                                    <span>✅ Exact Payment</span>
+                                    <span></span>
+                                </div>
+                            `}
+
+                            <h4 style="margin-top: 20px;">📋 Other Information</h4>
+                            <div class="detail-row">
+                                <span>UTR:</span>
+                                <span>${t.utr}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>Status:</span>
+                                <span style="color: ${t.status === 'VERIFIED' ? '#38ef7d' : '#ffd700'};">${t.status}</span>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    document.getElementById('statusResult').innerHTML = `
+                        <div class="error-message">❌ No ticket found for this phone number</div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('statusResult').innerHTML = `
+                    <div class="error-message">Error: ${error.message}</div>
+                `;
+            }
+        }
+
+        // Load Pending Students
+        async function loadPendingStudents() {
+            const loader = document.getElementById('pendingLoader');
+            const list = document.getElementById('pendingList');
+
+            loader.style.display = 'block';
+            list.innerHTML = '';
+
+            try {
+                const response = await fetch(`${CONFIG.apiUrl}?action=getUnverifiedList&token=${authToken}`);
+                const data = await response.json();
+
                 loader.style.display = 'none';
 
-                // Clear manual input
-                if (!fromScanner) {
-                    document.getElementById('manualUTR').value = '';
-                }
-            }
-        }
-
-        function showResult(html, type) {
-            const resultCard = document.getElementById('resultCard');
-            resultCard.innerHTML = html;
-            resultCard.className = `result-card result-${type}`;
-            resultCard.style.display = 'block';
-
-            // Auto-hide after 5 seconds
-            setTimeout(() => {
-                resultCard.style.display = 'none';
-            }, 5000);
-        }
-
-        async function loadStats() {
-            try {
-                const response = await fetch(`${API_URL}?action=getStats`);
-                const data = await response.json();
-
-                if (data.success) {
-                    document.getElementById('totalVerified').textContent = data.totalVerified;
-                    document.getElementById('totalPending').textContent = data.totalPending;
-                    document.getElementById('totalAmount').textContent = `₹${data.totalAmount}`;
-                }
-            } catch (error) {
-                console.error('Failed to load stats:', error);
-            }
-        }
-
-        function playSound(type) {
-            // Create audio context for sound feedback
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-
-            if (type === 'success') {
-                oscillator.frequency.value = 800;
-                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
-            } else {
-                oscillator.frequency.value = 300;
-                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-            }
-
-            oscillator.start();
-            oscillator.stop(audioContext.currentTime + 0.3);
-        }
-
-
-        async function loadPendingStudents() {
-            const listDiv = document.getElementById('pendingList');
-
-            try {
-                const response = await fetch(`${API_URL}?action=getUnverifiedList&token=${encodeURIComponent(currentUserToken)}`);
-                const data = await response.json();
-
                 if (data.success && data.students && data.students.length > 0) {
-                    let html = '<div style="background: rgba(0,0,0,0.6); border-radius: 15px; padding: 20px; margin-top: 15px;">';
-                    html += `<p style="color: #00f2fe; margin-bottom: 15px; font-size: 1.1em;">Total Unverified: <strong>${data.count}</strong></p>`;
-                    html += '<table style="width: 100%; border-collapse: collapse;">';
-                    html += '<thead><tr style="background: rgba(0,242,254,0.2); color: #00f2fe;">';
-                    html += '<th style="padding: 12px; text-align: left; border-bottom: 2px solid #00f2fe;">Name</th>';
-                    html += '<th style="padding: 12px; text-align: left; border-bottom: 2px solid #00f2fe;">Roll Number</th>';
-                    html += '<th style="padding: 12px; text-align: left; border-bottom: 2px solid #00f2fe;">Batch/Year</th>';
-                    html += '<th style="padding: 12px; text-align: left; border-bottom: 2px solid #00f2fe;">Phone</th>';
-                    html += '</tr></thead><tbody>';
-
-                    data.students.forEach((student, index) => {
-                        const bgColor = index % 2 === 0 ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.3)';
-                        html += `<tr style="background: ${bgColor}; color: #fff;">`;
-                        html += `<td style="padding: 10px; border-bottom: 1px solid rgba(0,242,254,0.1);">${student.name}</td>`;
-                        html += `<td style="padding: 10px; border-bottom: 1px solid rgba(0,242,254,0.1);">${student.rollNumber}</td>`;
-                        html += `<td style="padding: 10px; border-bottom: 1px solid rgba(0,242,254,0.1);">${student.year}</td>`;
-                        html += `<td style="padding: 10px; border-bottom: 1px solid rgba(0,242,254,0.1);">${student.phone}</td>`;
-                        html += '</tr>';
-                    });
-
-                    html += '</tbody></table></div>';
-                    listDiv.innerHTML = html;
-                    listDiv.style.display = 'block';
+                    list.innerHTML = `
+                        <h3 style="color: #00f2fe; margin: 20px 0 15px;">Found ${data.students.length} Pending Registrations</h3>
+                        <div style="overflow-x: auto;">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Roll</th>
+                                        <th>Year</th>
+                                        <th>Phone</th>
+                                        <th>Tickets</th>
+                                        <th>Amount</th>
+                                        <th>UTR</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${data.students.map(s => `
+                                        <tr>
+                                            <td>${s.name}</td>
+                                            <td>${s.rollNumber}</td>
+                                            <td>${s.year}</td>
+                                            <td>${s.phone}</td>
+                                            <td>${s.numberOfTickets || 1}</td>
+                                            <td>₹${s.totalAmount || 60}</td>
+                                            <td style="font-family: monospace;">${s.utr}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
                 } else {
-                    listDiv.innerHTML = '<p style="color: #38ef7d; padding: 20px; text-align: center; background: rgba(0,0,0,0.6); border-radius: 15px; margin-top: 15px;">No unverified students found</p>';
-                    listDiv.style.display = 'block';
+                    list.innerHTML = `
+                        <div style="text-align:center; padding:30px; color: rgba(255,255,255,0.7);">
+                            ✅ No pending students found. All registrations are verified!
+                        </div>
+                    `;
                 }
             } catch (error) {
-                console.error('Error loading unverified students:', error);
-                listDiv.innerHTML = '<p style="color: #ff0066; padding: 20px; text-align: center; background: rgba(0,0,0,0.6); border-radius: 15px; margin-top: 15px;">Error loading data</p>';
-                listDiv.style.display = 'block';
+                loader.style.display = 'none';
+                list.innerHTML = `<div class="error-message">Failed to load: ${error.message}</div>`;
             }
         }
 
-        async function downloadVerifiedList() {
-            try {
-                const response = await fetch(`${API_URL}?action=getVerifiedList&token=${encodeURIComponent(currentUserToken)}`);
-                const data = await response.json();
-
-                if (data.success && data.students) {
-                    // Convert to CSV
-                    let csv = 'Ticket ID,UTR,Name,Roll Number,Phone,Verified Time\n';
-
-                    data.students.forEach(student => {
-                        const time = new Date(student.verifiedTime).toLocaleString();
-                        csv += `${student.ticketID},${student.utr},"${student.name}",${student.rollNumber},${student.phone},"${time}"\n`;
-                    });
-
-                    // Create download link
-                    const blob = new Blob([csv], { type: 'text/csv' });
-                    const url = window.URL.createObjectURL(blob);
-                    const link = document.createElement('a');
-                    link.href = url;
-                    link.download = `tarang-verified-students-${new Date().toISOString().split('T')[0]}.csv`;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    window.URL.revokeObjectURL(url);
-
-                    showResult(`
-                        <h3>✅ Download Complete</h3>
-                        <p>Downloaded ${data.count} verified students</p>
-                    `, 'verified');
-                } else {
-                    showResult(`
-                        <h3>❌ Download Failed</h3>
-                        <p>No verified students found</p>
-                    `, 'error');
-                }
-            } catch (error) {
-                showResult(`
-                    <h3>❌ Download Failed</h3>
-                    <p>${error.message}</p>
-                `, 'error');
-            }
-        }
-
-
-        // Transactions Modal Functions
-        async function openTransactionsModal() {
-            const modal = document.getElementById('transactionsModal');
-            modal.style.display = 'block';
-            document.body.style.overflow = 'hidden'; // Prevent background scrolling
-
-            // Load transaction data
-            await loadTransactions();
-        }
-
-        function closeTransactionsModal() {
-            const modal = document.getElementById('transactionsModal');
-            modal.style.display = 'none';
-            document.body.style.overflow = 'auto'; // Restore scrolling
-        }
-
+        // Load Transactions
         async function loadTransactions() {
-            const loadingScreen = document.getElementById('transactionLoading');
-            const expensesSection = document.getElementById('expensesSection');
+            const loader = document.getElementById('transactionLoader');
+            const dataDiv = document.getElementById('transactionData');
 
-            // Show loading screen
-            loadingScreen.style.display = 'block';
-            expensesSection.style.display = 'none';
+            loader.style.display = 'block';
+            dataDiv.innerHTML = '';
 
             try {
-                const response = await fetch(`${API_URL}?action=getTransactions&token=${encodeURIComponent(currentUserToken)}`);
+                const response = await fetch(`${CONFIG.apiUrl}?action=getTransactions&token=${authToken}`);
                 const data = await response.json();
+
+                loader.style.display = 'none';
 
                 if (data.success) {
-                    // Update summary cards
-                    document.getElementById('modalTotalCollected').textContent = `₹${data.totalCollected}`;
-                    document.getElementById('modalVerifiedCount').textContent = `${data.verifiedStudents} verified students × ₹${data.ticketPrice}`;
-                    document.getElementById('modalTotalSpent').textContent = `₹${data.totalSpent}`;
-                    document.getElementById('modalExpenseCount').textContent = `${data.expenseCount} expenses`;
-                    document.getElementById('modalRemaining').textContent = `₹${data.remaining}`;
+                    const remaining = data.totalCollected - data.totalSpent;
 
-                    // Update remaining balance color (positive/negative)
-                    const remainingCard = document.getElementById('modalRemaining').parentElement;
-                    if (data.remaining >= 0) {
-                        remainingCard.classList.remove('negative');
-                        remainingCard.classList.add('positive');
-                    } else {
-                        remainingCard.classList.remove('positive');
-                        remainingCard.classList.add('negative');
-                    }
+                    dataDiv.innerHTML = `
+                        <div class="summary-grid">
+                            <div class="summary-card positive">
+                                <h4>Total Collected</h4>
+                                <div class="summary-amount">₹${data.totalCollected}</div>
+                                <div class="summary-description">${data.verifiedStudents} verified students × ₹${data.ticketPrice}</div>
+                            </div>
+                            <div class="summary-card negative">
+                                <h4>Total Spent</h4>
+                                <div class="summary-amount">₹${data.totalSpent}</div>
+                                <div class="summary-description">${data.expenseCount} expenses</div>
+                            </div>
+                            <div class="summary-card ${remaining >= 0 ? 'positive' : 'negative'}">
+                                <h4>Remaining Balance</h4>
+                                <div class="summary-amount">₹${remaining}</div>
+                                <div class="summary-description">Available funds</div>
+                            </div>
+                        </div>
 
-                    // Build expenses table
-                    const tableContainer = document.getElementById('expensesTableContainer');
-
-                    if (data.expenses && data.expenses.length > 0) {
-                        let tableHTML = '<table class="expenses-table">';
-                        tableHTML += '<thead><tr>';
-                        tableHTML += '<th>Date</th>';
-                        tableHTML += '<th>Description</th>';
-                        tableHTML += '<th>Category</th>';
-                        tableHTML += '<th>Amount</th>';
-                        tableHTML += '<th>Notes</th>';
-                        tableHTML += '</tr></thead><tbody>';
-
-                        data.expenses.forEach(expense => {
-                            tableHTML += '<tr>';
-                            tableHTML += `<td>${expense.date}</td>`;
-                            tableHTML += `<td>${expense.description}</td>`;
-                            tableHTML += `<td><span class="category-badge">${expense.category}</span></td>`;
-                            tableHTML += `<td style="font-weight: 600; color: #ff0066;">₹${expense.amount}</td>`;
-                            tableHTML += `<td style="font-size: 0.9em; color: rgba(255,255,255,0.7);">${expense.notes || '-'}</td>`;
-                            tableHTML += '</tr>';
-                        });
-
-                        tableHTML += '</tbody></table>';
-                        tableContainer.innerHTML = tableHTML;
-                    } else {
-                        tableContainer.innerHTML = '<div class="no-expenses">📭 No expenses recorded yet. Add expenses in the EXPENSES sheet.</div>';
-                    }
+                        ${data.expenses && data.expenses.length > 0 ? `
+                            <h3 style="color: #00f2fe; margin: 20px 0 15px;">📊 Expense Breakdown</h3>
+                            <div style="overflow-x: auto;">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Description</th>
+                                            <th>Category</th>
+                                            <th>Amount</th>
+                                            <th>Notes</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${data.expenses.map(e => `
+                                            <tr>
+                                                <td>${e.date}</td>
+                                                <td>${e.description}</td>
+                                                <td><span style="background: rgba(0,242,254,0.2); padding: 4px 8px; border-radius: 5px;">${e.category}</span></td>
+                                                <td style="font-weight: 600; color: #ff0066;">₹${e.amount}</td>
+                                                <td style="font-size: 0.85em; color: rgba(255,255,255,0.7);">${e.notes || '-'}</td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        ` : `
+                            <div style="text-align:center; padding:30px; color: rgba(255,255,255,0.7);">
+                                📭 No expenses recorded yet
+                            </div>
+                        `}
+                    `;
                 } else {
-                    console.error('Failed to load transactions:', data.error);
-                    document.getElementById('expensesTableContainer').innerHTML =
-                        '<div class="no-expenses">❌ Failed to load transaction data. Please try again.</div>';
+                    dataDiv.innerHTML = `<div class="error-message">Failed to load: ${data.error}</div>`;
                 }
-
-                // Hide loading screen and show expenses section
-                loadingScreen.style.display = 'none';
-                expensesSection.style.display = 'block';
-
             } catch (error) {
-                console.error('Error loading transactions:', error);
-                document.getElementById('expensesTableContainer').innerHTML =
-                    '<div class="no-expenses">❌ Error loading transaction data.</div>';
-
-                // Hide loading screen and show expenses section even on error
-                loadingScreen.style.display = 'none';
-                expensesSection.style.display = 'block';
+                loader.style.display = 'none';
+                dataDiv.innerHTML = `<div class="error-message">Error: ${error.message}</div>`;
             }
         }
-
-        // Close modal when clicking outside
-        document.addEventListener('click', function (event) {
-            const modal = document.getElementById('transactionsModal');
-            if (event.target === modal) {
-                closeTransactionsModal();
-            }
-        });
     </script>
 
     <!-- Developer Credit -->
