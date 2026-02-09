@@ -1131,13 +1131,13 @@
                     html5QrCode = new Html5Qrcode("reader");
                 }
 
-                // Optimized configuration - Balance of speed and reliability for Oppo
+                // Maximum speed configuration - Optimized for fast scanning
                 const config = {
-                    fps: 10, // Balanced FPS for good speed and compatibility
+                    fps: 15, // Higher FPS for faster detection (scans every 67ms)
                     qrbox: function (viewfinderWidth, viewfinderHeight) {
-                        // Optimized scan box - 65% for faster processing
+                        // 60% scan box - Good balance of speed and ease of use
                         let minEdgeSize = Math.min(viewfinderWidth, viewfinderHeight);
-                        let qrboxSize = Math.floor(minEdgeSize * 0.65);
+                        let qrboxSize = Math.floor(minEdgeSize * 0.6);
                         return {
                             width: qrboxSize,
                             height: qrboxSize
