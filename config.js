@@ -7,7 +7,7 @@ const CONFIG = {
     eventDescription: "Register for the most awaited event!",
 
     // Payment Details
-    ticketPrice: 85,
+    ticketPrice: 75,
     upiId: "saimusick204@okhdfcbank",
     upiName: "Sai Ram Kishan",
 
@@ -34,7 +34,7 @@ const CONFIG = {
     googleClientId: "1011495957114-jftfnap62g44g6a6l50psgc615tatckr.apps.googleusercontent.com",
 
     // API Endpoint
-    apiUrl: "https://script.google.com/macros/s/AKfycbwyetcJkhXz3zWF5ioT7xoYbzUCjEDCnBP6_ZZJOu1aNBtTBKYv-V3Pv7enH3U7WZuWBQ/exec",
+    apiUrl: "https://script.google.com/macros/s/AKfycbx6oaU-NuGtfA9f6wsxHPJg53FXd3K6wXLYiWNeO2bHZf_Dq16aDvOBQIryzbLnb0Cc2g/exec",
 
     // UI Theme Colors
     theme: {
