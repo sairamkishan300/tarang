@@ -1679,12 +1679,23 @@
                 const data = await response.json();
 
                 if (data.success && data.students) {
-                    // Convert to CSV
-                    let csv = 'Ticket ID,UTR,Name,Roll Number,Phone,Verified Time\n';
+                    // Convert to CSV with all fields
+                    let csv = 'Ticket ID,UTR,Name,Roll Number,Year/Batch,Phone,Number of Tickets,Required Amount,Paid Amount,Registration Time,Verified Time\n';
 
                     data.students.forEach(student => {
-                        const time = new Date(student.verifiedTime).toLocaleString();
-                        csv += `${student.ticketID},${student.utr},"${student.name}",${student.rollNumber},${student.phone},"${time}"\n`;
+                        // Formatting helpers
+                        const regTime = student.registrationTime ? new Date(student.registrationTime).toLocaleString('en-IN').replace(/,/g, '') : 'N/A';
+                        // Handle Verified Time: If missing, use registration time or current time as fallback (though Code.gs now sends it)
+                        const verTime = student.verifiedTime ? new Date(student.verifiedTime).toLocaleString('en-IN').replace(/,/g, '') : 'N/A';
+
+                        // Enforce string format for phone and UTR by prepending '
+                        const phone = `'${student.phone}`;
+                        const utr = `'${student.utr}`;
+
+                        // Handle potential commas in name
+                        const name = `"${student.name}"`;
+
+                        csv += `${student.ticketID},${utr},${name},${student.rollNumber},${student.year},${phone},${student.numberOfTickets},${student.requiredAmount},${student.paidAmount},"${regTime}","${verTime}"\n`;
                     });
 
                     // Create download link
