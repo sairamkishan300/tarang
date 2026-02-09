@@ -7,26 +7,29 @@
 
 
 
-  <title>Tarang#1 – Musical Evening 2026 | SVMCH&RI</title>
-  <meta name="description" content="Tarang#1 is a student-led musical and cultural evening by SVMCH&RI, with more inter-club events planned in the future.">
+    <title>Tarang#1 – Musical Evening 2026 | SVMCH&RI</title>
+    <meta name="description"
+        content="Tarang#1 is a student-led musical and cultural evening by SVMCH&RI, with more inter-club events planned in the future.">
 
-  <!-- Open Graph / WhatsApp / Discord -->
-  <meta property="og:title" content="Tarang#1 – Musical Evening 2026 | SVMCH&RI" />
-  <meta property="og:description" content="A student-led musical and cultural evening by SVMCH&RI. Join us and support student talent." />
-  <meta property="og:image" content="https://tarangfest.xyz/images/bg.jpg" />
-  <meta property="og:url" content="https://tarangfest.xyz" />
-  <meta property="og:type" content="website" />
+    <!-- Open Graph / WhatsApp / Discord -->
+    <meta property="og:title" content="Tarang#1 – Musical Evening 2026 | SVMCH&RI" />
+    <meta property="og:description"
+        content="A student-led musical and cultural evening by SVMCH&RI. Join us and support student talent." />
+    <meta property="og:image" content="https://tarangfest.xyz/images/bg.jpg" />
+    <meta property="og:url" content="https://tarangfest.xyz" />
+    <meta property="og:type" content="website" />
 
-  <!-- Discord -->
-  <meta name="theme-color" content="#8b5cf6">
+    <!-- Discord -->
+    <meta name="theme-color" content="#8b5cf6">
 
-  <!-- Site icon (this one CAN be relative) -->
-  <link rel="icon" type="image/png" href="images/logo.png">
+    <!-- Site icon (this one CAN be relative) -->
+    <link rel="icon" type="image/png" href="images/logo.png">
 
-  <!-- Google Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap"
+        rel="stylesheet">
 
-  <!-- Your CSS continues -->
+    <!-- Your CSS continues -->
 
 
 
@@ -283,11 +286,35 @@
         }
 
         .price {
-            font-size: 2.5em;
+            font-size: 2em;
             font-weight: 700;
-            text-align: center;
             color: #00f2fe;
-            margin: 20px 0;
+            margin: 15px 0;
+            text-shadow: 0 0 20px #00f2fe;
+        }
+
+        .price .offer-badge {
+            display: block;
+            font-size: 0.35em;
+            color: #ffd700;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            text-shadow: 0 0 15px #ffd700;
+        }
+
+        .price .original-price {
+            font-size: 0.6em;
+            color: #888;
+            text-decoration: line-through;
+            margin-right: 10px;
+            text-shadow: none;
+        }
+
+        .price .current-price {
+            color: #00f2fe;
+            font-size: 1em;
             text-shadow: 0 0 20px #00f2fe;
         }
 
@@ -1019,7 +1046,7 @@
 
         <!-- Registration Section - Moved to Top -->
         <div class="registration-section">
-            <div class="price">Entry: ₹85</div>
+            <div class="price" id="priceDisplay"></div>
             <a href="registration.html" class="cta-button">REGISTER NOW</a>
         </div>
 
@@ -1142,9 +1169,39 @@
         const API_URL = CONFIG.apiUrl;
         const EVENT_DATE = new Date('2026-03-07T17:00:00+05:30'); // Event start time: 5:00 PM IST
 
-        // Update price dynamically from config
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelector('.price').textContent = `Entry: ₹${CONFIG.ticketPrice}`;
+        // Update price dynamically from config with offer support
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Fetch configuration from Google Sheets
+            try {
+                const response = await fetch(`${API_URL}?action=getConfig`);
+                const data = await response.json();
+
+                if (data.success && data.config) {
+                    // Merge API config with local CONFIG
+                    Object.assign(CONFIG, data.config);
+                }
+            } catch (error) {
+                console.error('Failed to load config from API:', error);
+                // Continue with defaults if API fails
+            }
+
+            const priceDisplay = document.getElementById('priceDisplay');
+            const ticketPrice = CONFIG.ticketPrice || 60;
+            const offerName = CONFIG.offerName;
+            const originalPrice = CONFIG.originalPrice || 100;
+
+            // Check if there's an active offer
+            if (offerName && offerName !== 'false' && offerName !== false) {
+                // Show offer with strikethrough original price
+                priceDisplay.innerHTML = `
+                    <span class="offer-badge">🎉 ${offerName} 🎉</span>
+                    Entry: <span class="original-price">₹${originalPrice}</span>
+                    <span class="current-price">₹${ticketPrice}</span>
+                `;
+            } else {
+                // Show simple price
+                priceDisplay.textContent = `Entry: ₹${ticketPrice}`;
+            }
 
             // Update college name from config
             document.getElementById('collegeBadge').textContent = CONFIG.collegeName;
