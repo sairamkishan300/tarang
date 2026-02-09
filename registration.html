@@ -452,10 +452,16 @@
             </div>
 
             <div class="form-card">
+                <!-- Loading overlay while fetching config -->
+                <div id="configLoader" style="text-align: center; padding: 40px; display: block;">
+                    <div class="loader" style="display: inline-block;"></div>
+                    <p style="color: #00f2fe; margin-top: 15px; font-size: 1.1em;">⚙️ Loading configuration...</p>
+                </div>
+
                 <div id="message" class="message"></div>
                 <div class="loader" id="loader"></div>
 
-                <form id="registrationForm">
+                <form id="registrationForm" style="display: none;">
                     <!-- Ticket Selection FIRST -->
                     <div class="form-group">
                         <label for="tickets">Number of Tickets *</label>
@@ -530,6 +536,9 @@
 
         // Initialize page - fetch config from API and populate ticket options
         document.addEventListener('DOMContentLoaded', async () => {
+            const configLoader = document.getElementById('configLoader');
+            const registrationForm = document.getElementById('registrationForm');
+
             try {
                 // Fetch configuration from Google Sheets
                 const response = await fetch(`${API_URL}?action=getConfig`);
@@ -543,6 +552,10 @@
                 console.error('Failed to load config from API:', error);
                 // Continue with defaults if API fails
             }
+
+            // Hide loader, show form
+            configLoader.style.display = 'none';
+            registrationForm.style.display = 'block';
 
             // Set UPI ID display
             document.getElementById('upiIdDisplay').textContent = CONFIG.upiId || 'saimusick204@okhdfcbank';
