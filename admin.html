@@ -1121,38 +1121,112 @@
                     html5QrCode = new Html5Qrcode("reader");
                 }
 
+                // Enhanced configuration with better compatibility for Oppo/OnePlus
                 const config = {
-                    fps: 30,
-                    qrbox: 250,
+                    fps: 10, // Lower FPS for better compatibility
+                    qrbox: { width: 250, height: 250 }, // Fixed box dimensions
+                    aspectRatio: 1.0, // Square aspect ratio
                     disableFlip: false,
-                    experimentalFeatures: {
-                        useBarCodeDetectorIfSupported: true
+                    videoConstraints: {
+                        facingMode: { ideal: "environment" },
+                        aspectRatio: 1.0
                     },
-                    showTorchButtonIfSupported: true
+                    // Disable experimental features for better compatibility
+                    experimentalFeatures: {
+                        useBarCodeDetectorIfSupported: false // Disabled for Oppo/OnePlus
+                    },
+                    showTorchButtonIfSupported: true,
+                    formatsToSupport: [
+                        Html5QrcodeSupportedFormats.QR_CODE
+                    ]
                 };
 
-                await html5QrCode.start(
-                    { facingMode: "environment" },
-                    config,
-                    (decodedText, decodedResult) => {
-                        console.log("QR Code detected:", decodedText);
-                        scannedUTR = decodedText;
-                        stopScanner();
-                        showNotification(decodedText);
-                    },
-                    (errorMessage) => {
-                        // Scanning error (ignore - fires continuously)
-                    }
-                );
+                // Try multiple camera selection methods for better compatibility
+                let cameraStarted = false;
 
-                isScanning = true;
-                scanBtn.textContent = '⏹️ Stop Scanning';
-                scanBtn.classList.add('scanning');
-                scanBtn.disabled = false;
+                // Method 1: Try with environment facing mode (Standard approach)
+                try {
+                    await html5QrCode.start(
+                        { facingMode: "environment" },
+                        config,
+                        (decodedText, decodedResult) => {
+                            console.log("QR Code detected:", decodedText);
+                            scannedUTR = decodedText;
+                            stopScanner();
+                            showNotification(decodedText);
+                        },
+                        (errorMessage) => {
+                            // Scanning error (ignore - fires continuously)
+                        }
+                    );
+                    cameraStarted = true;
+                } catch (error1) {
+                    console.log("Method 1 failed, trying alternative...", error1);
+
+                    // Method 2: Get available cameras and select rear camera explicitly
+                    try {
+                        const cameras = await Html5Qrcode.getCameras();
+                        console.log("Available cameras:", cameras);
+
+                        if (cameras && cameras.length > 0) {
+                            // Find rear camera (usually has 'back' or 'rear' in label or is the first camera)
+                            let rearCamera = cameras.find(cam =>
+                                cam.label.toLowerCase().includes('back') ||
+                                cam.label.toLowerCase().includes('rear') ||
+                                cam.label.toLowerCase().includes('environment')
+                            );
+
+                            // If no rear camera found, use the last camera (often rear on many devices)
+                            if (!rearCamera && cameras.length >= 2) {
+                                rearCamera = cameras[cameras.length - 1];
+                            } else if (!rearCamera) {
+                                rearCamera = cameras[0];
+                            }
+
+                            console.log("Selected camera:", rearCamera);
+
+                            await html5QrCode.start(
+                                rearCamera.id,
+                                config,
+                                (decodedText, decodedResult) => {
+                                    console.log("QR Code detected:", decodedText);
+                                    scannedUTR = decodedText;
+                                    stopScanner();
+                                    showNotification(decodedText);
+                                },
+                                (errorMessage) => {
+                                    // Scanning error (ignore - fires continuously)
+                                }
+                            );
+                            cameraStarted = true;
+                        }
+                    } catch (error2) {
+                        console.error("Method 2 also failed:", error2);
+                        throw new Error("Unable to start camera. Please ensure camera permissions are granted.");
+                    }
+                }
+
+                if (cameraStarted) {
+                    isScanning = true;
+                    scanBtn.textContent = '⏹️ Stop Scanning';
+                    scanBtn.classList.add('scanning');
+                    scanBtn.disabled = false;
+                }
 
             } catch (err) {
                 console.error("Camera access failed:", err);
-                alert("Camera access denied or not available. Please use manual entry.");
+
+                // More helpful error messages
+                let errorMsg = "Camera access failed. ";
+                if (err.name === 'NotAllowedError' || err.message.includes('Permission')) {
+                    errorMsg += "Please allow camera permissions in your browser settings and try again.";
+                } else if (err.message.includes('not supported')) {
+                    errorMsg += "Your browser may not support camera access. Try using Chrome or Firefox.";
+                } else {
+                    errorMsg += "Please use manual entry instead.";
+                }
+
+                alert(errorMsg);
                 readerDiv.style.display = 'none';
                 scanBtn.disabled = false;
                 scanBtn.textContent = '📸 Scan QR Code';
