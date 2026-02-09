@@ -999,8 +999,14 @@
                     </div>
                 </div>
 
+                <!-- Loading Screen -->
+                <div class="loading-verification" id="transactionLoading" style="display: none; margin: 40px 0;">
+                    <div class="spinner"></div>
+                    <p style="color: #00f2fe; font-size: 1.1em;">Loading financial data...</p>
+                </div>
+
                 <!-- Expenses List -->
-                <div class="expenses-section">
+                <div class="expenses-section" id="expensesSection" style="display: none;">
                     <h3>📝 Expense Breakdown</h3>
                     <div id="expensesTableContainer">
                         <!-- Table will be populated by JavaScript -->
@@ -1478,6 +1484,13 @@
         }
 
         async function loadTransactions() {
+            const loadingScreen = document.getElementById('transactionLoading');
+            const expensesSection = document.getElementById('expensesSection');
+
+            // Show loading screen
+            loadingScreen.style.display = 'block';
+            expensesSection.style.display = 'none';
+
             try {
                 const response = await fetch(`${API_URL}?action=getTransactions&token=${encodeURIComponent(currentUserToken)}`);
                 const data = await response.json();
@@ -1533,10 +1546,19 @@
                     document.getElementById('expensesTableContainer').innerHTML =
                         '<div class="no-expenses">❌ Failed to load transaction data. Please try again.</div>';
                 }
+
+                // Hide loading screen and show expenses section
+                loadingScreen.style.display = 'none';
+                expensesSection.style.display = 'block';
+
             } catch (error) {
                 console.error('Error loading transactions:', error);
                 document.getElementById('expensesTableContainer').innerHTML =
                     '<div class="no-expenses">❌ Error loading transaction data.</div>';
+
+                // Hide loading screen and show expenses section even on error
+                loadingScreen.style.display = 'none';
+                expensesSection.style.display = 'block';
             }
         }
 
