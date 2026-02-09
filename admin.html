@@ -921,6 +921,16 @@
                 <h3>📷 QR Code Scanner</h3>
                 <button class="scan-btn" id="scanBtn" onclick="toggleScanner()">📸 Scan QR Code</button>
                 <div id="reader"></div>
+                <div id="scanInstructions"
+                    style="display: none; margin-top: 15px; padding: 15px; background: rgba(0, 242, 254, 0.1); border: 1px solid #00f2fe; border-radius: 10px; text-align: center;">
+                    <p style="color: #00f2fe; margin: 0; font-size: 0.9em;">
+                        💡 <strong>Scanning Tips:</strong><br>
+                        • Hold QR code 15-20cm from camera<br>
+                        • Ensure good lighting<br>
+                        • Keep QR code steady and flat<br>
+                        • Wait 3-5 seconds for detection
+                    </p>
+                </div>
             </div>
 
             <div class="manual-input">
@@ -1121,24 +1131,41 @@
                     html5QrCode = new Html5Qrcode("reader");
                 }
 
-                // Enhanced configuration with better compatibility for Oppo/OnePlus
+                // Enhanced configuration optimized for Oppo/OnePlus QR detection
                 const config = {
-                    fps: 10, // Lower FPS for better compatibility
-                    qrbox: { width: 250, height: 250 }, // Fixed box dimensions
-                    aspectRatio: 1.0, // Square aspect ratio
+                    fps: 5, // Even lower FPS for better processing on Oppo devices
+                    qrbox: function (viewfinderWidth, viewfinderHeight) {
+                        // Larger scan box for better detection (80% of viewfinder)
+                        let minEdgeSize = Math.min(viewfinderWidth, viewfinderHeight);
+                        let qrboxSize = Math.floor(minEdgeSize * 0.8);
+                        return {
+                            width: qrboxSize,
+                            height: qrboxSize
+                        };
+                    },
+                    aspectRatio: 1.0,
                     disableFlip: false,
                     videoConstraints: {
                         facingMode: { ideal: "environment" },
-                        aspectRatio: 1.0
+                        aspectRatio: 1.0,
+                        // Advanced constraints for better autofocus and quality
+                        advanced: [{
+                            focusMode: "continuous",
+                            zoom: 1.0
+                        }],
+                        width: { ideal: 1280 },  // Higher resolution for better detection
+                        height: { ideal: 720 }
                     },
-                    // Disable experimental features for better compatibility
                     experimentalFeatures: {
-                        useBarCodeDetectorIfSupported: false // Disabled for Oppo/OnePlus
+                        useBarCodeDetectorIfSupported: false
                     },
                     showTorchButtonIfSupported: true,
                     formatsToSupport: [
                         Html5QrcodeSupportedFormats.QR_CODE
-                    ]
+                    ],
+                    // Additional settings for better detection
+                    defaultZoomValueIfSupported: 2,
+                    supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA]
                 };
 
                 // Try multiple camera selection methods for better compatibility
@@ -1211,6 +1238,9 @@
                     scanBtn.textContent = '⏹️ Stop Scanning';
                     scanBtn.classList.add('scanning');
                     scanBtn.disabled = false;
+                    // Show scanning instructions
+                    document.getElementById('scanInstructions').style.display = 'block';
+                    console.log('Scanner started successfully. Hold QR code 15-20cm from camera.');
                 }
 
             } catch (err) {
@@ -1244,6 +1274,8 @@
                     scanBtn.textContent = '📸 Scan QR Code';
                     scanBtn.classList.remove('scanning');
                     scanBtn.disabled = false;
+                    // Hide scanning instructions
+                    document.getElementById('scanInstructions').style.display = 'none';
                 }).catch(err => {
                     console.error('Error stopping scanner:', err);
                 });
