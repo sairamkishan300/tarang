@@ -461,16 +461,7 @@
                         <label for="tickets">Number of Tickets *</label>
                         <select id="tickets" required>
                             <option value="">Select Quantity</option>
-                            <option value="1">1 Ticket - ₹85</option>
-                            <option value="2">2 Tickets - ₹170</option>
-                            <option value="3">3 Tickets - ₹255</option>
-                            <option value="4">4 Tickets - ₹340</option>
-                            <option value="5">5 Tickets - ₹425</option>
-                            <option value="6">6 Tickets - ₹510</option>
-                            <option value="7">7 Tickets - ₹595</option>
-                            <option value="8">8 Tickets - ₹680</option>
-                            <option value="9">9 Tickets - ₹765</option>
-                            <option value="10">10 Tickets - ₹850</option>
+                            <!-- Options populated dynamically from CONFIG.ticketPrice -->
                         </select>
                     </div>
 
@@ -537,9 +528,21 @@
         let totalAmount = 0;
         let numberOfTickets = 0;
 
-        // Initialize UPI ID on page load
+        // Initialize UPI ID on page load and populate ticket options
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('upiIdDisplay').textContent = CONFIG.upiId;
+
+            // Dynamically populate ticket options based on CONFIG.ticketPrice
+            const ticketsSelect = document.getElementById('tickets');
+            const MAX_TICKETS = 10;
+
+            for (let i = 1; i <= MAX_TICKETS; i++) {
+                const price = i * CONFIG.ticketPrice;
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = `${i} Ticket${i > 1 ? 's' : ''} - ₹${price}`;
+                ticketsSelect.appendChild(option);
+            }
         });
 
         // Show payment section when ticket quantity is selected
