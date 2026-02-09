@@ -1351,7 +1351,7 @@
                 }
 
                 if (data.success && data.status === 'VERIFIED') {
-                    showResult(`
+                    let detailsHTML = `
                         <h3>✅ VERIFIED</h3>
                         <div class="result-details">
                             <div class="detail-row">
@@ -1370,8 +1370,27 @@
                                 <span>Phone:</span>
                                 <strong>${data.phone}</strong>
                             </div>
-                        </div>
-                    `, 'verified');
+                            <div class="detail-row">
+                                <span>Number of Tickets:</span>
+                                <strong style="color: #00f2fe;">${data.numberOfTickets || 1}</strong>
+                            </div>
+                            <div class="detail-row">
+                                <span>Amount Paid:</span>
+                                <strong>₹${data.actualAmount}</strong>
+                            </div>
+                    `;
+
+                    if (data.overpayment && data.overpayment > 0) {
+                        detailsHTML += `
+                            <div class="detail-row">
+                                <span>Overpayment:</span>
+                                <strong style="color: #38ef7d;">+₹${data.overpayment}</strong>
+                            </div>
+                        `;
+                    }
+
+                    detailsHTML += '</div>';
+                    showResult(detailsHTML, 'verified');
 
                     // Play success sound
                     playSound('success');
@@ -1391,12 +1410,30 @@
                         <p>${data.message}</p>
                     `, 'warning');
                     playSound('error');
-                } else if (data.status === 'INVALID_AMOUNT') {
-                    showResult(`
-                        <h3>❌ INVALID AMOUNT</h3>
+                } else if (data.status === 'INSUFFICIENT_AMOUNT' || data.status === 'INVALID_AMOUNT') {
+                    let amountDetailsHTML = `
+                        <h3>❌ INSUFFICIENT PAYMENT</h3>
                         <p>${data.message}</p>
-                        <p style="margin-top: 10px;">Paid: <strong>₹${data.actualAmount}</strong> | Required: <strong>₹${data.requiredAmount}</strong></p>
-                    `, 'error');
+                        <div class="result-details" style="margin-top: 15px;">
+                            <div class="detail-row">
+                                <span>Tickets:</span>
+                                <strong>${data.numberOfTickets || 1}</strong>
+                            </div>
+                            <div class="detail-row">
+                                <span>Required Amount:</span>
+                                <strong>₹${data.requiredAmount}</strong>
+                            </div>
+                            <div class="detail-row">
+                                <span>Paid Amount:</span>
+                                <strong style="color: #ff0066;">₹${data.actualAmount}</strong>
+                            </div>
+                            <div class="detail-row">
+                                <span>Shortfall:</span>
+                                <strong style="color: #ff0066;">₹${data.requiredAmount - data.actualAmount}</strong>
+                            </div>
+                        </div>
+                    `;
+                    showResult(amountDetailsHTML, 'error');
                     playSound('error');
                 } else if (data.status === 'PAYMENT_FAILED') {
                     showResult(`
