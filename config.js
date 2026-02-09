@@ -6,10 +6,8 @@ const CONFIG = {
     eventDate: "March 7, 2026",
     eventDescription: "Register for the most awaited event!",
 
-    // Payment Details
-    ticketPrice: 75,
-    upiId: "saimusick204@okhdfcbank",
-    upiName: "Sai Ram Kishan",
+    // To update prices: Edit CONFIG sheet in Google Sheets
+    // ticketPrice, originalPrice, offerName, upiId, upiName - all loaded via API
 
     // Contact & Support
     supportEmail: "saimusick204@gmail.com",
