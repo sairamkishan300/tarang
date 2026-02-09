@@ -6,6 +6,18 @@ const CONFIG = {
     eventDate: "March 7, 2026",
     eventDescription: "Register for the most awaited event!",
 
+    // Year/Batch Options for Registration
+    yearOptions: [
+        "2025 batch",
+        "Kranoviantz'24",
+        "Invictuz'23",
+        "Troizeantz'22",
+        "Exordiantz'21",
+        "CRMI",
+        "PG",
+        "Others"
+    ],
+
     // To update prices: Edit CONFIG sheet in Google Sheets
     // ticketPrice, originalPrice, offerName, upiId, upiName - all loaded via API
 
