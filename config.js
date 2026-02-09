@@ -44,7 +44,7 @@ const CONFIG = {
     googleClientId: "1011495957114-jftfnap62g44g6a6l50psgc615tatckr.apps.googleusercontent.com",
 
     // API Endpoint
-    apiUrl: "https://script.google.com/macros/s/AKfycbwRTL-9xXzw0qoHroxwTime1rsHfhZIkiLGyPC1radQYVqXjrO_wuc5G_kG4wBF1MjTJw/exec",
+    apiUrl: "https://script.google.com/macros/s/AKfycbxTfaWWro6c_Q0rZ5OBaHSBfE7aX2m_qA75ACzbtoDjkERK-uvcxRibLV3Xx9qB8DRDUQ/exec",
 
     // UI Theme Colors
     theme: {
