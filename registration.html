@@ -216,6 +216,8 @@
         }
 
         .upi-qr img {
+            display: block;
+            margin: 0 auto;
             max-width: 180px;
             border-radius: 12px;
             background: white;
@@ -427,27 +429,24 @@
             <h1 class="title">REGISTER</h1>
             <div class="subtitle">TARANG#1 • MARCH 7, 2026</div>
 
-            <div class="payment-info">
+            <!-- Payment section - hidden initially, shown after ticket selection -->
+            <div class="payment-info" id="paymentSection" style="display: none;">
                 <h3>💳 Payment First</h3>
-                <div class="price-tag" id="priceDisplay">₹85</div>
-
-                <p style="color: #ff0066; font-weight: bold; font-size: 0.95em; margin: 10px 0; padding: 8px; background: rgba(255,0,102,0.1); border-radius: 8px; border: 1px solid rgba(255,0,102,0.3);"
-                    id="paymentWarning">
-                    Select tickets below to see total amount
-                </p>
+                <div class="price-tag" id="priceDisplay"></div>
 
                 <div class="upi-qr">
-                    <img id="dynamicQR" src="images/upi.png" alt="UPI QR Code">
+                    <img id="dynamicQR" alt="UPI QR Code" style="display: none;">
                 </div>
 
-                <div class="upi-id-box">
+                <div class="upi-id-box" id="upiIdSection" style="display: none;">
                     <label>UPI ID</label>
-                    <div class="upi-id-text" id="upiIdDisplay">saimusick204@oksbi</div>
+                    <div class="upi-id-text" id="upiIdDisplay"></div>
                 </div>
 
-                <button class="copy-btn" onclick="copyUPI()">📋 Copy UPI ID</button>
+                <button class="copy-btn" id="copyBtn" onclick="copyUPI()" style="display: none;">📋 Copy UPI ID</button>
 
-                <p style="color: #aaa; margin-top: 15px; font-size: 0.9em; text-align: center;">
+                <p style="color: #aaa; margin-top: 15px; font-size: 0.9em; text-align: center;" id="paymentInstructions"
+                    style="display: none;">
                     Scan QR or pay via UPI, then enter UTR below
                 </p>
             </div>
@@ -457,6 +456,24 @@
                 <div class="loader" id="loader"></div>
 
                 <form id="registrationForm">
+                    <!-- Ticket Selection FIRST -->
+                    <div class="form-group">
+                        <label for="tickets">Number of Tickets *</label>
+                        <select id="tickets" required>
+                            <option value="">Select Quantity</option>
+                            <option value="1">1 Ticket - ₹85</option>
+                            <option value="2">2 Tickets - ₹170</option>
+                            <option value="3">3 Tickets - ₹255</option>
+                            <option value="4">4 Tickets - ₹340</option>
+                            <option value="5">5 Tickets - ₹425</option>
+                            <option value="6">6 Tickets - ₹510</option>
+                            <option value="7">7 Tickets - ₹595</option>
+                            <option value="8">8 Tickets - ₹680</option>
+                            <option value="9">9 Tickets - ₹765</option>
+                            <option value="10">10 Tickets - ₹850</option>
+                        </select>
+                    </div>
+
                     <div class="form-group">
                         <label for="name">Full Name *</label>
                         <input type="text" id="name" required placeholder="Enter your name">
@@ -474,27 +491,8 @@
                             <option value="1st">1st Year</option>
                             <option value="2nd">2nd Year</option>
                             <option value="3rd">3rd Year</option>
-                            <option value="Final">Final Year</option>
-                            <option value="CRMI">CRMI</option>
-                            <option value="PG">PG</option>
+                            <option value="4th">4th Year</option>
                             <option value="Others">Others</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="tickets">Number of Tickets *</label>
-                        <select id="tickets" required>
-                            <option value="">Select Quantity</option>
-                            <option value="1">1 Ticket - ₹85</option>
-                            <option value="2">2 Tickets - ₹170</option>
-                            <option value="3">3 Tickets - ₹250</option>
-                            <option value="4">4 Tickets - ₹340</option>
-                            <option value="5">5 Tickets - ₹425</option>
-                            <option value="6">6 Tickets - ₹510</option>
-                            <option value="7">7 Tickets - ₹595</option>
-                            <option value="8">8 Tickets - ₹680</option>
-                            <option value="9">9 Tickets - ₹765</option>
-                            <option value="10">10 Tickets - ₹850</option>
                         </select>
                     </div>
 
@@ -536,42 +534,50 @@
     <script>
         const API_URL = CONFIG.apiUrl;
         let currentUTR = '';
-        let totalAmount = CONFIG.ticketPrice;
-        let numberOfTickets = 1;
+        let totalAmount = 0;
+        let numberOfTickets = 0;
 
-        // Update price and UPI from CONFIG on page load
+        // Initialize UPI ID on page load
         document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('priceDisplay').textContent = `₹${CONFIG.ticketPrice}`;
             document.getElementById('upiIdDisplay').textContent = CONFIG.upiId;
-            document.getElementById('paymentWarning').innerHTML = 'Select tickets below to see total amount';
-
-            // Initialize with static QR (will be replaced when user selects tickets)
-            updatePaymentDisplay();
         });
 
-        // Update payment display and QR code when ticket quantity changes
+        // Show payment section when ticket quantity is selected
         document.getElementById('tickets').addEventListener('change', function () {
-            numberOfTickets = parseInt(this.value) || 1;
-            totalAmount = numberOfTickets * CONFIG.ticketPrice;
+            numberOfTickets = parseInt(this.value);
 
-            updatePaymentDisplay();
-            generateDynamicUPIQR();
-        });
-
-        function updatePaymentDisplay() {
             if (numberOfTickets > 0) {
-                document.getElementById('priceDisplay').textContent = `₹${totalAmount}`;
-                document.getElementById('paymentWarning').innerHTML =
-                    `Pay <strong>₹${totalAmount}</strong> for <strong>${numberOfTickets}</strong> ticket(s)`;
+                totalAmount = numberOfTickets * CONFIG.ticketPrice;
+
+                // Show payment section
+                const paymentSection = document.getElementById('paymentSection');
+                paymentSection.style.display = 'block';
+
+                // Update price display
+                document.getElementById('priceDisplay').textContent = `\u20b9${totalAmount}`;
+
+                // Generate and show dynamic UPI QR code
+                generateDynamicUPIQR();
+                document.getElementById('dynamicQR').style.display = 'block';
+
+                // Show UPI ID and copy button
+                document.getElementById('upiIdSection').style.display = 'block';
+                document.getElementById('copyBtn').style.display = 'inline-block';
+                document.getElementById('paymentInstructions').style.display = 'block';
+
+                // Scroll payment section into view
+                paymentSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } else {
+                // Hide payment section if no tickets
+                document.getElementById('paymentSection').style.display = 'none';
             }
-        }
+        });
 
         function generateDynamicUPIQR() {
-            // UPI payment link format with amount embedded
-            // Format: upi://pay?pa=UPI_ID&pn=NAME&am=AMOUNT&cu=INR&tn=NOTE
-            const upiLink = `upi://pay?pa=${encodeURIComponent(CONFIG.upiId)}&pn=${encodeURIComponent(CONFIG.upiName)}&am=${totalAmount}&cu=INR&tn=${encodeURIComponent('Tarang Ticket - ' + numberOfTickets + ' ticket(s)')}`;
+            // UPI deep link format with amount embedded
+            const upiLink = `upi://pay?pa=${encodeURIComponent(CONFIG.upiId)}&pn=${encodeURIComponent(CONFIG.upiName)}&am=${totalAmount}&cu=INR&tn=${encodeURIComponent('Tarang ' + numberOfTickets + ' ticket(s)')}`;
 
-            // Generate QR code using free QR API
+            // Generate QR code using API
             const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiLink)}`;
 
             // Update QR code image
@@ -617,10 +623,11 @@
                     generateQR(currentUTR);
                     qrContainer.style.display = 'block';
                     document.getElementById('registrationForm').reset();
-                    // Reset ticket count and amount
-                    numberOfTickets = 1;
-                    totalAmount = CONFIG.ticketPrice;
-                    updatePaymentDisplay();
+
+                    // Reset ticket selection and hide payment section
+                    numberOfTickets = 0;
+                    totalAmount = 0;
+                    document.getElementById('paymentSection').style.display = 'none';
                 } else {
                     showMessage(`Error: ${data.error || 'Registration failed'}`, 'error');
                 }
