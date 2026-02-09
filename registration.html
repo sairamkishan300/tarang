@@ -528,16 +528,32 @@
         let totalAmount = 0;
         let numberOfTickets = 0;
 
-        // Initialize UPI ID on page load and populate ticket options
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('upiIdDisplay').textContent = CONFIG.upiId;
+        // Initialize page - fetch config from API and populate ticket options
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // Fetch configuration from Google Sheets
+                const response = await fetch(`${API_URL}?action=getConfig`);
+                const data = await response.json();
+
+                if (data.success && data.config) {
+                    // Merge API config with local CONFIG
+                    Object.assign(CONFIG, data.config);
+                }
+            } catch (error) {
+                console.error('Failed to load config from API:', error);
+                // Continue with defaults if API fails
+            }
+
+            // Set UPI ID display
+            document.getElementById('upiIdDisplay').textContent = CONFIG.upiId || 'saimusick204@okhdfcbank';
 
             // Dynamically populate ticket options based on CONFIG.ticketPrice
             const ticketsSelect = document.getElementById('tickets');
             const MAX_TICKETS = 10;
+            const ticketPrice = CONFIG.ticketPrice || 60;
 
             for (let i = 1; i <= MAX_TICKETS; i++) {
-                const price = i * CONFIG.ticketPrice;
+                const price = i * ticketPrice;
                 const option = document.createElement('option');
                 option.value = i;
                 option.textContent = `${i} Ticket${i > 1 ? 's' : ''} - ₹${price}`;
