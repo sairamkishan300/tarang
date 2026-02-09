@@ -9,7 +9,7 @@ const CONFIG = {
     // Year/Batch Options for Registration
     yearOptions: [
         "2025 batch",
-        "Kranoviantz'24",
+        "Krenoviantz'24",
         "Invictuz'23",
         "Troizeantz'22",
         "Exordiantz'21",
