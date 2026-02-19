@@ -1014,6 +1014,124 @@
             }
 
         }
+
+        /* Gallery Styles */
+        .gallery-section {
+            width: 100%;
+            max-width: 800px;
+            margin: 40px 0;
+            text-align: center;
+        }
+
+        .gallery-title {
+            font-size: 2.5em;
+            color: #00f2fe;
+            margin-bottom: 20px;
+            text-shadow: 0 0 15px #00f2fe;
+        }
+
+        .gallery-container {
+            position: relative;
+            width: 100%;
+            border: 3px solid #ff0066;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(255, 0, 102, 0.5);
+            background: transparent;
+            aspect-ratio: 16 / 9;
+            /* Maintain aspect ratio */
+        }
+
+        .gallery-wrapper {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+            height: 100%;
+        }
+
+        .gallery-slide {
+            min-width: 100%;
+            height: 100%;
+            object-fit: contain;
+            /* Ensure full image is visible */
+            display: block;
+            background: transparent;
+        }
+
+        .gallery-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.6);
+            color: #00f2fe;
+            border: 2px solid #00f2fe;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.3s ease;
+            display: flex;
+            /* Center the arrow */
+            align-items: center;
+            /* Center the arrow */
+            justify-content: center;
+            /* Center the arrow */
+            padding-bottom: 3px;
+            /* visual fix */
+        }
+
+        .gallery-nav:hover {
+            background: #00f2fe;
+            color: #000;
+            box-shadow: 0 0 15px #00f2fe;
+        }
+
+        .gallery-nav.prev {
+            left: 15px;
+        }
+
+        .gallery-nav.next {
+            right: 15px;
+        }
+
+        .gallery-dots {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        .gallery-dot {
+            width: 12px;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid #00f2fe;
+        }
+
+        .gallery-dot.active {
+            background: #00f2fe;
+            box-shadow: 0 0 10px #00f2fe;
+            transform: scale(1.2);
+        }
+
+        @media (max-width: 768px) {
+            .gallery-title {
+                font-size: 2em;
+            }
+
+            .gallery-nav {
+                width: 35px;
+                height: 35px;
+                font-size: 18px;
+            }
+        }
     </style>
 </head>
 
@@ -1052,15 +1170,21 @@
             <a href="registration.html" class="cta-button">REGISTER NOW</a>
         </div>
 
-        <div class="dj-section">
-            <div class="dj-content">
-                <h2 class="dj-title">🎧 FEATURING DJ EVENING 🎧</h2>
-                <img src="images/dj.jpg" alt="DJ Night" class="dj-image">
-                <p style="text-align: center; font-size: 1.2em; margin-top: 20px; color: #00f2fe;">
-                    Live Band • Sing-Along Piano • DJ Session
-                </p>
+        <!-- Photo Gallery Section -->
+        <div class="gallery-section">
+            <div class="gallery-container">
+                <div class="gallery-wrapper" id="galleryWrapper">
+                    <!-- Images will be injected here by JS -->
+                </div>
+                <!-- Navigation Arrows -->
+                <button class="gallery-nav prev" onclick="moveGallery(-1)">&#10094;</button>
+                <button class="gallery-nav next" onclick="moveGallery(1)">&#10095;</button>
+                <!-- Dots -->
+                <div class="gallery-dots" id="galleryDots"></div>
             </div>
         </div>
+
+
 
         <!-- About Section - Square/Centered Box -->
         <div class="about-section">
@@ -1126,24 +1250,12 @@
         <div class="schedule">
             <h3>🎵 Event Schedule</h3>
             <div class="schedule-item">
-                <div class="schedule-time">5:00 PM – 5:15 PM</div>
-                <div class="schedule-event">Stage & Sound Setup</div>
-            </div>
-            <div class="schedule-item">
-                <div class="schedule-time">5:15 PM – 5:45 PM</div>
+                <div class="schedule-time">4:30 PM – 5:50 PM</div>
                 <div class="schedule-event">College Band Performance</div>
             </div>
-            <div class="schedule-item">
-                <div class="schedule-time">5:45 PM – 6:00 PM</div>
-                <div class="schedule-event">Dance / Group Singing</div>
-            </div>
-            <div class="schedule-item">
-                <div class="schedule-time">6:00 PM – 6:15 PM</div>
-                <div class="schedule-event">Break (Refreshments)</div>
-            </div>
             <div class="schedule-item highlight">
-                <div class="schedule-time">6:15 PM – 7:30 PM</div>
-                <div class="schedule-event">🎹 Sing-Along Piano & DJ Session 🎧</div>
+                <div class="schedule-time">5:50 PM – 6:30 PM</div>
+                <div class="schedule-event">🎹 Sing-Along Piano Session</div>
             </div>
         </div>
     </div>
@@ -1192,12 +1304,16 @@
                 // Continue with defaults if API fails
             }
 
-            const ticketPrice = CONFIG.ticketPrice || 60;
+            const ticketPrice = (CONFIG.ticketPrice !== undefined) ? CONFIG.ticketPrice : 60;
             const offerName = CONFIG.offerName;
             const originalPrice = CONFIG.originalPrice || 100;
 
             // Check if there's an active offer
-            if (offerName && offerName !== 'false' && offerName !== false) {
+            if (String(ticketPrice) === '0' || ticketPrice === 0) {
+                priceDisplay.innerHTML = `
+                    <span class="current-price" style="font-size: 1.5em; color: #38ef7d; text-shadow: 0 0 10px #38ef7d;">Entry Free for Everyone</span>
+                `;
+            } else if (offerName && offerName !== 'false' && offerName !== false) {
                 // Show offer with strikethrough original price
                 priceDisplay.innerHTML = `
                     <span class="offer-badge">🎉 ${offerName} 🎉</span>
@@ -1294,6 +1410,82 @@
                 element.style.opacity = '1';
             }, 200);
         }
+
+        // --- Gallery Subsystem ---
+        const galleryImages = [
+            'images/poster.png',
+            'images/poster2.png',
+            'images/poster3.png'
+            // Add more images here: 'images/posterN.png'
+        ];
+
+        let currentIndex = 0;
+        let galleryInterval;
+
+        function initGallery() {
+            const wrapper = document.getElementById('galleryWrapper');
+            const dotsContainer = document.getElementById('galleryDots');
+
+            if (!wrapper) return;
+
+            // Generate Slides
+            galleryImages.forEach((src, index) => {
+                const img = document.createElement('img');
+                img.src = src;
+                img.className = 'gallery-slide';
+                img.alt = `Event Highlight ${index + 1}`;
+                wrapper.appendChild(img);
+
+                // Generate Dots
+                const dot = document.createElement('dot');
+                dot.className = `gallery-dot ${index === 0 ? 'active' : ''}`;
+                dot.onclick = () => goToSlide(index);
+                dotsContainer.appendChild(dot);
+            });
+
+            startGalleryAutoSlide();
+        }
+
+        function updateGallery() {
+            const wrapper = document.getElementById('galleryWrapper');
+            const dots = document.querySelectorAll('.gallery-dot');
+
+            // Move wrapper
+            wrapper.style.transform = `translateX(-${currentIndex * 100}%)`;
+
+            // Update dots
+            dots.forEach((dot, index) => {
+                dot.className = `gallery-dot ${index === currentIndex ? 'active' : ''}`;
+            });
+        }
+
+        function moveGallery(direction) {
+            clearInterval(galleryInterval);
+            currentIndex += direction;
+
+            if (currentIndex >= galleryImages.length) currentIndex = 0;
+            if (currentIndex < 0) currentIndex = galleryImages.length - 1;
+
+            updateGallery();
+            startGalleryAutoSlide();
+        }
+
+        function goToSlide(index) {
+            clearInterval(galleryInterval);
+            currentIndex = index;
+            updateGallery();
+            startGalleryAutoSlide();
+        }
+
+        function startGalleryAutoSlide() {
+            clearInterval(galleryInterval);
+            galleryInterval = setInterval(() => {
+                moveGallery(1);
+            }, 3000); // Slide every 3 seconds
+        }
+
+        // Initialize gallery when DOM is loaded (after other inits)
+        initGallery();
     </script>
 
     <!-- Footer Credits -->
